@@ -11,7 +11,7 @@
 <!-- Main container -->
 <div class="container-fluid min-vh-100 d-flex">
     <!-- Left column for login form -->
-    <div class="col-md-4 p-5">
+    <div class="col-md-4 p-5 d-flex align-items-center justify-content-center">
         <div class="login-container">
             <!-- Title section -->
             <div class="mb-5">
@@ -66,31 +66,37 @@
     </div>
 
     <!-- Right column for images -->
-    <div class="col-md-8 d-flex justify-content-center align-items-center bg-light p-4">
+    <div class="col-md-8 d-flex justify-content-center align-items-center bg-light p-4 position-relative"> <!-- Añadido position-relative -->
+        <!-- Logo en la esquina superior izquierda -->
+        <div class="position-absolute top-0 start-0 p-3"> <!-- Contenedor del logo -->
+            <img src="{{ asset('imagenes/logo-las-condes.png') }}" alt="Logo Las Condes" class="img-fluid" style="max-width: 100px;"> <!-- Ajusta el tamaño del logo -->
+        </div>
+
+        <!-- Imagen de portada -->
         <img src="{{ asset('imagenes/portada.jpg') }}" alt="Imagen de portada" class="img-fluid rounded shadow img-custom">
     </div>
 </div>
 
 <style>
-.text-navy {
-    color: #2A2859;
-}
+    .text-navy {
+        color: #2A2859;
+    }
 
-.btn-primary {
-    background-color: #2A2859;
-    border-color: #2A2859;
-}
+    .btn-primary {
+        background-color: #2A2859;
+        border-color: #2A2859;
+    }
 
-.btn-primary:hover {
-    background-color: #1e1d40;
-    border-color: #1e1d40;
-}
+    .btn-primary:hover {
+        background-color: #1e1d40;
+        border-color: #1e1d40;
+    }
 
-.img-custom {
-    max-width: 80%; /* La imagen no ocupará más del 80% del ancho disponible */
-    max-height: 90vh; /* Altura máxima del 80% de la pantalla */
-    object-fit: contain; /* Mantiene la proporción de la imagen sin recortarla */
-    border-radius: 10px; /* Bordes redondeados */
-}
+    .img-custom {
+        max-width: 80%; /* La imagen no ocupará más del 80% del ancho disponible */
+        max-height: 90vh; /* Altura máxima del 80% de la pantalla */
+        object-fit: contain; /* Mantiene la proporción de la imagen sin recortarla */
+        border-radius: 10px; /* Bordes redondeados */
+    }
 
 </style>
