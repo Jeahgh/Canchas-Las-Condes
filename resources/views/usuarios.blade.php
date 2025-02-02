@@ -2,7 +2,82 @@
  
 @section('content')
 
+<!-- Botón para abrir el modal  -->
+<button class="btn-primary create-user-btn" onclick="openModalAgregar()">
+    <i class="fas fa-plus"></i> Agregar Usuario
+</button>
 
+<!-- Modal Agregar usuario-->
+<div id="userModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Crear Usuario</h2>
+            <span class="close" onclick="closeModalAgregar()">&times;</span>
+        </div>
+        
+        <form id="userForm" onsubmit="guardarUsuario(event)">
+            <div class="form-section">
+                <h3>Información del Usuario</h3>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="rut">RUT</label>
+                        <input type="text" id="rut" name="rut" required placeholder="Ej: 12345678-9">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="nombre">Nombre Completo</label>
+                        <input type="text" id="nombre" name="nombre" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Correo Electrónico</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="telefono">Teléfono</label>
+                        <input type="tel" id="telefono" name="telefono" placeholder="+56">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fecha_nacimiento">Fecha de Nacimiento</label>
+                        <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="genero">Género</label>
+                        <select id="genero" name="genero" required>
+                            <option value="">Seleccionar Género</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="femenino">Femenino</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="rol">Rol</label>
+                        <select id="rol" name="rol" required>
+                            <option value="">Seleccionar Rol</option>
+                            <option value="1">Administrador</option>
+                            <option value="2">Vecino</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModalAgregar()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <table class="user-table">
     <thead>
@@ -26,8 +101,8 @@
             <td class="user-table-cell">{{ $usuario->rut }}</td>
             <td class="user-table-cell">{{ $usuario->email }}</td>
             <td class="user-table-cell">{{ $usuario->telefono }}</td>
-            <td class="user-table-cell">{{ $usuario->rol }}</td>
-            <td class="user-table-cell">{{ $usuario->estado }}</td>
+            <td class="user-table-cell">{{ $usuario->rol_nombre }}</td>
+            <td class="user-table-cell">{{ $usuario->estado_nombre }}</td>
             <td class="user-table-cell">{{ $usuario->fecha_registro }}</td>
             <td class="user-table-cell">
                 <div class="action-buttons">
@@ -65,18 +140,42 @@
 
 
 <script>
+
+    // Cerrar el modal si se hace clic fuera de él
+    window.onclick = function(event) {
+        const modal = document.getElementById("userModal");
+        if (event.target == modal) {
+            closeModalAgregar();
+        }
+    }
+
+    //Función guardar usuario
+    async function guardarUsuario(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const datos = Object.fromEntries(formData);
+        
+        try {
+            await axios.post('crearUsuario', datos);
+            closeModalAgregar();
+            location.reload();
+        } catch (error) {
+            console.error("Error al guardar:", error);
+            alert("Error al guardar el usuario");
+        }
+    }
+
     // Funciones para el CRUD
     let usuarioIdEditando = null;
     
-    // Abrir el modal
-    // function openModalAgregar() {
-    //     document.getElementById("userModal").style.display = "block";  // Muestra el modal
-    // }
-    
-    // Cerrar el modal
-    // function closeModalAgregar() {
-    //     document.getElementById("userModal").style.display = "none";   // Oculta el modal
-    // }
+    function openModalAgregar() {
+        document.getElementById("userModal").style.display = "block";
+    }
+
+    function closeModalAgregar() {
+        document.getElementById("userModal").style.display = "none";
+        document.getElementById("userForm").reset();
+    }
 
     // function openModalEdit() {
     //     document.getElementById("userModalEdit").style.display = "block";  // Muestra el modal
@@ -117,14 +216,19 @@
         const datos = Object.fromEntries(formData);
         
         try {
-            await axios.post('/createUser', datos);
+            const response = await axios.post('crearUsuario', datos);
             closeModalAgregar();
             location.reload();
         } catch (error) {
             console.error("Error al guardar:", error);
+            if (error.response && error.response.data) {
+                alert("Error: " + JSON.stringify(error.response.data));
+            } else {
+                alert("Error al guardar el usuario");
+            }
         }
     }
-    
+        
     //Editar usuario
     async function editarUsuario(id) {
         usuarioIdEditando = id; // Guardamos el ID
@@ -240,10 +344,7 @@
     }
 
     
-    // Event Listeners
-    document.getElementById('userForm').addEventListener('submit', guardarUsuario);
-    document.addEventListener('DOMContentLoaded', cargarUsuarios);
-    document.getElementById('userFormEdit').addEventListener('submit', actualizarUsuario);
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
@@ -370,6 +471,122 @@
         color: white;         /* Color blanco para todos los íconos */
         font-size: 14px;      /* Tamaño uniforme para los íconos */
     }
+
+
+
+
+    .create-user-btn {
+    margin: 20px 0;
+    padding: 10px 20px;
+    background-color: #00d1b2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 5% auto;
+    width: 80%;
+    max-width: 800px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.modal-header {
+    background-color: #181f47;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close {
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.form-section {
+    padding: 20px;
+}
+
+.form-section h3 {
+    color: #363636;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #dbdbdb;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #363636;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #dbdbdb;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.modal-footer {
+    padding: 15px 20px;
+    background-color: #f5f5f5;
+    border-radius: 0 0 8px 8px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-secondary {
+    background-color: #b5b5b5;
+    color: white;
+}
+
+.btn-primary {
+    background-color: #181f47;
+    color: white;
+}
 
 </style>
 

@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Canchas</title>
+    <title>Canchas Las Condes</title>
 
+    {{-- header con inicio de sesión --}}
     @if(Auth::check())
     <header class="nav-header">
         <div class="user-menu">
@@ -24,103 +25,27 @@
     </header>
     @endif
     
-    <style>
-        body {
-            display: flex;
-            min-height: 100vh;
-        }
-        .sidebar {
-            width: 250px;
-            background-color: #181f47;
-            color: white;
-            padding: 20px;
-        }
-        .sidebar a {
-            color: white;
-            text-decoration: none;
-            display: block;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 5px 0;
-        }
-        .sidebar a:hover {
-            background-color: #38374b22;
-        }
-        .content {
-            flex-grow: 1;
-            padding: 20px;
-        }
+    {{-- estilos generales de la página  --}}
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}"> 
 
-        .nav-header {
-            background-color: #181f47;
-            color: white;
-            padding: 12px 20px;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-        }
-
-        .user-menu {
-                position: relative;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                color: white;
-                cursor: pointer;
-            }
-
-            .user-icon {
-                background: rgba(255, 255, 255, 0.1);
-                padding: 8px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-            }
-
-            .dropdown-menu {
-                position: absolute;
-                top: 100%;
-                right: 0;
-                background: white;
-                border-radius: 8px;
-                padding: 8px;
-                margin-top: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                display: none;
-            }
-
-
-            .dropdown-menu button {
-                width: 100%;
-                padding: 8px 16px;
-                border: none;
-                background: none;
-                color: #333;
-                cursor: pointer;
-                text-align: left;
-            }
-
-            .dropdown-menu button:hover {
-                background: #f5f5f5;
-                border-radius: 4px;
-            }
-
-            .user-menu:hover .dropdown-menu {
-                display: block;
-            }
-
-
-
-    </style>
 </head>
 <body>
+
+    {{-- clase sidebar y todos los botones --}}
     <div class="sidebar">
-        <img src="{{ asset('imagenes/logo-las-condes-blanco.avif') }}" 
-        alt="Logo Las Condes" class="img-fluid" style="max-width: 100px;"> <!-- Ajusta el tamaño del logo -->
-        <a href="{{ route('home') }}"><i class="fas fa-home"></i> Inicio</a>
-        <a href="{{ route('contacto.index') }}"><i class="fas fa-envelope"></i> Contáctanos</a>
-        <a href="{{ route('canchas.index') }}"><i class="fas fa-calendar-check"></i> Reserva</a>
-        <a href="{{ route('usuarios.index') }}"><i class="fas fa-users"></i> Usuarios</a>
+        <a href="{{ route('home') }}">
+            <img src="{{ asset('imagenes/logo-las-condes-blanco.avif') }}" 
+            alt="Logo Las Condes" 
+            class="img-fluid logo-centered">
+        </a>
+  
+        <nav class="menu-links">
+            <a href="{{ route('home') }}"><i class="fas fa-home"></i> Inicio</a>
+            <a href="{{ route('contacto.index') }}"><i class="fas fa-envelope"></i> Contáctanos</a>
+            <a href="{{ route('canchas.index') }}"><i class="fas fa-calendar-check"></i> Reserva</a>
+            <a href="{{ route('usuarios.index') }}"><i class="fas fa-users"></i> Usuarios</a>
+        </nav>
+
     </div>
 
     <!-- Bootstrap CSS -->
@@ -132,6 +57,7 @@
     <!-- Bootstrap JavaScript (al final del body) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+    {{-- En esta parte va toda la información --}}
     <div class="content">
         @yield('content')
     </div>

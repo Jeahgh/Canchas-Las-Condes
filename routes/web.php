@@ -38,4 +38,6 @@ Route::post('/login', [LoginController::class, 'loginUser'])
     Route::get('contacto', [ContactoController::class, 'index'])->name('contacto.index');
     Route::get('canchas', [CanchasController::class, 'index'])->name('canchas.index');
     Route::get('usuarios', [UsuariosController::class, 'index'])->name('usuarios.index');
+
+    Route::post('crearUsuario', [UsuariosController::class, 'createUser'])->name('user.create');
 // });
