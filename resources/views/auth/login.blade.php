@@ -20,7 +20,7 @@
             </div>
 
             <!-- Login form -->
-            <form method="POST" action="{{ route('login') }}" class="mt-4">
+            <form method="POST" action="{{ route('login.post') }}" class="mt-4">
                 @csrf
                 
                 <!-- Login message -->
@@ -30,7 +30,7 @@
                 <div class="form-group mb-3">
                     <div class="input-group">
                         <input type="text" class="form-control py-2" 
-                               name="username" 
+                               name="rut" 
                                placeholder="Ingresar rut sin puntos y con guión"
                                required>
                         <span class="input-group-text">

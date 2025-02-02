@@ -9,19 +9,6 @@ use App\Http\Controllers\Auth\LoginController;
 
 
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
-
-
 
 //Auth::routes();
 
@@ -32,12 +19,15 @@ Route::get('/login', function () {
 
 Route::post('/login', [LoginController::class, 'loginUser'])
     ->name('login.post');
+Route::post('/logout', [LoginController::class, 'logout'])
+    ->name('logout');
+    
 
-// Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('contacto', [ContactoController::class, 'index'])->name('contacto.index');
     Route::get('canchas', [CanchasController::class, 'index'])->name('canchas.index');
     Route::get('usuarios', [UsuariosController::class, 'index'])->name('usuarios.index');
 
     Route::post('crearUsuario', [UsuariosController::class, 'createUser'])->name('user.create');
-// });
+});
