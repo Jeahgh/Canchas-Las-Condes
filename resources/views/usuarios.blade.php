@@ -21,33 +21,33 @@
                 
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="rut">RUT</label>
-                        <input type="text" id="rut" name="rut" required placeholder="Ej: 12345678-9">
+                        <label for="rutCrear">RUT</label>
+                        <input type="text" id="rutCrear" name="rut" required placeholder="Ej: 12345678-9">
                     </div>
                     
                     <div class="form-group">
-                        <label for="nombre">Nombre Completo</label>
-                        <input type="text" id="nombre" name="nombre" required>
+                        <label for="nombreCrear">Nombre Completo</label>
+                        <input type="text" id="nombreCrear" name="nombre" required>
                     </div>
                     
                     <div class="form-group">
-                        <label for="email">Correo Electrónico</label>
-                        <input type="email" id="email" name="email" required>
+                        <label for="emailCrear">Correo Electrónico</label>
+                        <input type="email" id="emailCrear" name="email" required>
                     </div>
                     
                     <div class="form-group">
-                        <label for="telefono">Teléfono</label>
-                        <input type="tel" id="telefono" name="telefono" placeholder="+56">
+                        <label for="telefonoCrear">Teléfono</label>
+                        <input type="tel" id="telefonoCrear" name="telefono" placeholder="+56">
                     </div>
 
                     <div class="form-group">
-                        <label for="fecha_nacimiento">Fecha de Nacimiento</label>
-                        <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                        <label for="fecha_nacimiento_Crear">Fecha de Nacimiento</label>
+                        <input type="date" id="fecha_nacimiento_Crear" name="fecha_nacimiento" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="genero">Género</label>
-                        <select id="genero" name="genero" required>
+                        <label for="generoCrear">Género</label>
+                        <select id="generoCrear" name="genero" required>
                             <option value="">Seleccionar Género</option>
                             <option value="masculino">Masculino</option>
                             <option value="femenino">Femenino</option>
@@ -56,13 +56,13 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="password">Contraseña</label>
-                        <input type="password" id="password" name="password" required>
+                        <label for="passwordCrear">Contraseña</label>
+                        <input type="password" id="passwordCrear" name="password" required>
                     </div>
                     
                     <div class="form-group">
-                        <label for="rol">Rol</label>
-                        <select id="rol" name="rol" required>
+                        <label for="rolCrear">Rol</label>
+                        <select id="rolCrear" name="rol" required>
                             <option value="">Seleccionar Rol</option>
                             <option value="1">Administrador</option>
                             <option value="2">Vecino</option>
@@ -79,6 +79,172 @@
     </div>
 </div>
 
+ <!-- Modal editar usuario-->
+<div id="userModalEdit" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Editar Usuario</h2>
+            <span class="close" onclick="closeModalEdit()">&times;</span>
+        </div>
+        
+        <form id="userFormEdit" onsubmit="guardarUsuarioEdit(event)">
+            <div class="form-section">
+                <h3>Información del Usuario</h3>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="rutEdit">RUT</label>
+                        <input type="text" id="rutEdit" name="rut" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="nombreEdit">Nombre Completo</label>
+                        <input type="text" id="nombreEdit" name="nombre" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="emailEdit">Correo Electrónico</label>
+                        <input type="email" id="emailEdit" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="telefonoEdit">Teléfono</label>
+                        <input type="tel" id="telefonoEdit" name="telefono" placeholder="+56">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fecha_nacimiento_Edit">Fecha de Nacimiento</label>
+                        <input type="date" id="fecha_nacimiento_Edit" name="fecha_nacimiento" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="generoEdit">Género</label>
+                        <select id="generoEdit" name="genero" required>
+                            <option value="">Seleccionar Género</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="femenino">Femenino</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="passwordEdit">Contraseña</label>
+                        <input type="password" id="passwordEdit" name="password" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="rolEdit">Rol</label>
+                        <select id="rolEdit" name="rol" required>
+                            <option value="">Seleccionar Rol</option>
+                            <option value="1">Administrador</option>
+                            <option value="2">Vecino</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModalEditar()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+ <!-- Modal ver usuario-->
+<div id="userModalVer" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Ver Usuario</h2>
+            <span class="close" onclick="closeModalVer()">&times;</span>
+        </div>
+        
+        <form id="userFormVer">
+            <div class="form-section">
+                <h3>Información del Usuario</h3>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="rutVer">RUT</label>
+                        <input disabled type="text" id="rutVer" name="rut" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="nombreVer">Nombre Completo</label>
+                        <input  disabled type="text" id="nombreVer" name="nombre" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="emailVer">Correo Electrónico</label>
+                        <input  disabled type="email" id="emailVer" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="telefonoVer">Teléfono</label>
+                        <input  disabled type="tel" id="telefonoVer" name="telefono" placeholder="+56">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fecha_nacimiento_ver">Fecha de Nacimiento</label>
+                        <input disabled type="date" id="fecha_nacimiento_ver" name="fecha_nacimiento" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="generoVer">Género</label>
+                        <select id="generoVer" name="genero" required disabled>
+                            <option value="">Seleccionar Género</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="femenino">Femenino</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="passwordVer">Contraseña</label>
+                        <input disabled type="password" id="passwordVer" name="password" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="rolVer">Rol</label>
+                        <select id="rolVer" name="rol" required disabled>
+                            <option value="">Seleccionar Rol</option>
+                            <option value="1">Administrador</option>
+                            <option value="2">Vecino</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModalVer()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal confirmación de eliminación -->
+<div id="deleteConfirmModal" class="modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-secundary rounded">
+                <div class="modal-title text-grey h2">
+                    Eliminar
+                </div>
+                <button type="button" class="btn-close" aria-label="Close" onclick="closeDeleteModal()"></button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 18px; margin-bottom: 20px;">¿Estás seguro que deseas eliminar este usuario de forma permanente?</p>
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button onclick="closeDeleteModal()" class="btn-open" style="background-color: #004D99;">Cancelar</button>
+                    <button onclick="confirmarEliminacion()" class="btn-open" style="background-color: #dc3545;">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Tabla de usuarios --}}
 <table class="user-table">
     <thead>
         <tr>
@@ -101,8 +267,8 @@
             <td class="user-table-cell">{{ $usuario->rut }}</td>
             <td class="user-table-cell">{{ $usuario->email }}</td>
             <td class="user-table-cell">{{ $usuario->telefono }}</td>
-            <td class="user-table-cell">{{ $usuario->rol_nombre }}</td>
-            <td class="user-table-cell">{{ $usuario->estado_nombre }}</td>
+            <td class="user-table-cell">{{ $usuario->rol }}</td>
+            <td class="user-table-cell">{{ $usuario->estado = true ? 'Habilitado' : 'Deshabilitado' }}</td>
             <td class="user-table-cell">{{ $usuario->fecha_registro }}</td>
             <td class="user-table-cell">
                 <div class="action-buttons">
@@ -139,279 +305,72 @@
 </table>
 
 
-<script>
-
-    // Cerrar el modal si se hace clic fuera de él
-    window.onclick = function(event) {
-        const modal = document.getElementById("userModal");
-        if (event.target == modal) {
-            closeModalAgregar();
-        }
-    }
-
-    //Función guardar usuario
-    async function guardarUsuario(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const datos = Object.fromEntries(formData);
-        
-        try {
-            await axios.post('crearUsuario', datos);
-            closeModalAgregar();
-            location.reload();
-        } catch (error) {
-            console.error("Error al guardar:", error);
-            alert("Error al guardar el usuario");
-        }
-    }
-
-    // Funciones para el CRUD
-    let usuarioIdEditando = null;
-    
-    function openModalAgregar() {
-        document.getElementById("userModal").style.display = "block";
-    }
-
-    function closeModalAgregar() {
-        document.getElementById("userModal").style.display = "none";
-        document.getElementById("userForm").reset();
-    }
-
-    // function openModalEdit() {
-    //     document.getElementById("userModalEdit").style.display = "block";  // Muestra el modal
-    // }
-    
-    // Cerrar el modal
-    // function closeModalEdit() {
-    //     document.getElementById("userModalEdit").style.display = "none";   // Oculta el modal
-    // }
-    // function openModalVer() {
-    //     document.getElementById("userModalVer").style.display = "block";  // Muestra el modal
-    // }
-    
-    // Cerrar el modal
-    // function closeModalVer() {
-    //     document.getElementById("userModalVer").style.display = "none";   // Oculta el modal
-    // }
-
-    
-    // Cargar usuarios
-    async function cargarUsuarios() {
-        try {
-            const response = await axios.get('/getUsuarios');
-            let data = response.data;
-            console.log("Esta es mi informacion:: ",data);
-            
-            // actualizarTablaUsuarios(usuarios);
-        } catch (error) {
-            console.error("Error al cargar usuarios:", error);
-        }
-    }
-
-    
-    // Crear o actualizar usuario
-    async function guardarUsuario(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const datos = Object.fromEntries(formData);
-        
-        try {
-            const response = await axios.post('crearUsuario', datos);
-            closeModalAgregar();
-            location.reload();
-        } catch (error) {
-            console.error("Error al guardar:", error);
-            if (error.response && error.response.data) {
-                alert("Error: " + JSON.stringify(error.response.data));
-            } else {
-                alert("Error al guardar el usuario");
-            }
-        }
-    }
-        
-    //Editar usuario
-    async function editarUsuario(id) {
-        usuarioIdEditando = id; // Guardamos el ID
-        openModalEdit();
-        try {
-            const response = await axios.post(`/editarUsuario/${id}`);
-             // Guardamos los datos del usuario que nos devolvió el servidor
-            const usuario = response.data;
-            
-            // Llena los campos del formulario
-            document.querySelector('#nameEdit').value = usuario.name;
-            document.querySelector('#emailEdit').value = usuario.email;
-            document.querySelector('#telefonoEdit').value = usuario.telefono;
-        } catch (error) {
-            console.error("Error al cargar los datos del usuario:", error);
-            // Y mostramos una alerta al usuario
-            alert("No se pudo cargar la información del usuario.");
-        }
-    }
-
-
-    async function deshabilitarUsuario(id) {
-        try {
-            const response = await axios.post(`/deshabilitarUsuario/${id}`);
-            alert(response.data.message);
-            window.location.reload(); // Recarga inmediata después de cerrar la alerta
-        } catch (error) {
-            console.error("Error al cambiar estado del usuario:", error);
-            alert("Error al cambiar el estado del usuario");
-        }
-    }
-
-    async function actualizarUsuario(event) {
-        event.preventDefault();
-        
-        if (!usuarioIdEditando) return;
-
-        // Creamos un objeto con todos los datos del formulario
-        const formData = new FormData(event.target);
-        const datos = Object.fromEntries(formData);
-        
-        try {
-            await axios.put(`/usuarios/${usuarioIdEditando}`, datos);
-            closeModalEdit();
-            location.reload(); // Recarga la página para ver los cambios
-        } catch (error) {
-            console.error("Error al actualizar:", error);
-            alert("Error al actualizar el usuario: le fatla un campo por asignar");
-        }
-    }
-
-    async function verUsuario(id) {
-        openModalVer();
-        try {
-            // Obtén los datos del usuario desde el backend
-            const response = await axios.get(`/getUsuarios/${id}`);
-            const usuario = response.data;
-            console.log('usuarios:: ', usuario);
-            
-            // Llena los campos del formulario del modal
-            document.querySelector('#nameVer').value = usuario.name;
-            document.querySelector('#emailVer').value = usuario.email;
-            document.querySelector('#telefonoVer').value = usuario.telefono;
-
-
-            // Muestra el modal
-        } catch (error) {
-            console.error("Error al cargar los datos del usuario:", error);
-            alert("No se pudo cargar la información del usuario.");
-        }
-    }
-        
-    // Eliminar usuario
-    async function eliminarUsuario(id) {
-        if (confirm('¿Estás seguro de eliminar este usuario?')) {
-            try {
-                await axios.delete(`/usuarios/${id}`);
-            } catch (error) {
-                console.error("Error al eliminar:", error);
-            }
-        }
-    }
-
-    // funciones para eliminar al usuario
-
-
-    let usuarioIdAEliminar = null;
-
-    function closeDeleteModal() {
-        document.getElementById("deleteConfirmModal").style.display = "none";
-    }
-
-    function mostrarConfirmacionEliminar(id) {
-        usuarioIdAEliminar = id;
-        document.getElementById("deleteConfirmModal").style.display = "block";
-    }
-
-    async function confirmarEliminacion() {
-        if (usuarioIdAEliminar) {
-            try {
-                await axios.delete(`/usuarios/${usuarioIdAEliminar}`);
-                cargarUsuarios();
-                closeDeleteModal();
-                location.reload()
-            } catch (error) {
-                console.error("Error al eliminar:", error);
-            }
-         }
-    }
-
-    function eliminarUsuario(id) {
-    mostrarConfirmacionEliminar(id);
-    }
-
-    
-
-</script>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="{{ asset('js/usuarios.js') }}"></script>
 
 <style>
     /* Tabla */
     .user-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #f5f5f5;
-    }
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #f5f5f5;
+        }
 
     .user-table th,
     .user-table td {
-    padding: 12px 16px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-    }
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+        }
 
     .user-table th {
-    background-color: #0e0d49;
-    color: white;
-    }
+        background-color: #0e0d49;
+        color: white;
+        }
 
     .user-table tr:hover {
-    background-color: #e6e6e6;
-    }
+        background-color: #e6e6e6;
+        }
 
     /* Botones de Acción */
     .btn {
-    display: inline-block;
-    padding: 8px 16px;
-    border-radius: 4px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-    }
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+        }
 
     .btn-primary {
-    background-color: #00d1b2;
-    color: white;
-    }
+        background-color: #00d1b2;
+        color: white;
+        }
 
     .btn-primary:hover {
-    background-color: #00b29e;
-    }
+        background-color: #00b29e;
+        }
 
     .btn-danger {
-    background-color: #ff3860;
-    color: white;
-    }
+        background-color: #ff3860;
+        color: white;
+        }
 
     .btn-danger:hover {
-    background-color: #f14668;
-    }
+        background-color: #f14668;
+        }
 
     /* Información del Usuario */
     .user-info {
-    background-color: #f5f5f5;
-    padding: 16px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+        background-color: #f5f5f5;
+        padding: 16px;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
     .user-info h3 {
-    color: #2A2859;
-    margin-bottom: 8px;
-    }
+        color: #2A2859;
+        margin-bottom: 8px;
+        }
 
     .user-info p {
     margin-bottom: 4px;
@@ -476,119 +435,123 @@
 
 
     .create-user-btn {
-    margin: 20px 0;
-    padding: 10px 20px;
-    background-color: #00d1b2;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+        margin: 20px 0;
+        padding: 10px 20px;
+        background-color: #00d1b2;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-}
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+    }
 
-.modal-content {
-    background-color: #fff;
-    margin: 5% auto;
-    width: 80%;
-    max-width: 800px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
+    .modal-content {
+        background-color: #fff;
+        margin: 5% auto;
+        width: 80%;
+        max-width: 800px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
 
-.modal-header {
-    background-color: #181f47;
-    color: white;
-    padding: 15px 20px;
-    border-radius: 8px 8px 0 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+    .modal-header {
+        background-color: #181f47;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px 8px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-.close {
-    color: white;
-    font-size: 28px;
-    cursor: pointer;
-}
+    .close {
+        color: white;
+        font-size: 28px;
+        cursor: pointer;
+    }
 
-.form-section {
-    padding: 20px;
-}
+    .form-section {
+        padding: 20px;
+    }
 
-.form-section h3 {
-    color: #363636;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #dbdbdb;
-}
+    .form-section h3 {
+        color: #363636;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #dbdbdb;
+    }
 
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-}
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
 
-.form-group {
-    margin-bottom: 15px;
-}
+    .form-group {
+        margin-bottom: 15px;
+    }
 
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    color: #363636;
-    font-weight: 500;
-}
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #363636;
+        font-weight: 500;
+    }
 
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #dbdbdb;
-    border-radius: 4px;
-    font-size: 14px;
-}
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #dbdbdb;
+        border-radius: 4px;
+        font-size: 14px;
+    }
 
-.modal-footer {
-    padding: 15px 20px;
-    background-color: #f5f5f5;
-    border-radius: 0 0 8px 8px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
+    .modal-footer {
+        padding: 15px 20px;
+        background-color: #f5f5f5;
+        border-radius: 0 0 8px 8px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
 
-.btn {
-    padding: 8px 16px;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
-    font-weight: 500;
-}
+    .btn {
+        padding: 8px 16px;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+    }
 
-.btn-secondary {
-    background-color: #b5b5b5;
-    color: white;
-}
+    .btn-secondary {
+        background-color: #b5b5b5;
+        color: white;
+    }
 
-.btn-primary {
-    background-color: #181f47;
-    color: white;
-}
+    .btn-primary {
+        background-color: #181f47;
+        color: white;
+    }
+
+    
 
 </style>
 
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 @endsection

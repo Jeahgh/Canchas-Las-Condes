@@ -4,23 +4,42 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
 class UsuariosController extends Controller
 {
+
+    // Vista de usuarios
     public function index()
     {
-        $usuarios = User::select('id', 'nombre', 'rut', 'email', 'telefono', 'rol', 'estado', 'fecha_registro')
+        $usuarios = User::select('id', 'nombre', 'rut', 'email', 'telefono',
+        DB::raw("CASE WHEN rol = 1 THEN 'Administrador' ELSE 'Vecino' END AS rol"),
+        DB::raw("CASE WHEN estado = 1 THEN 'Habilitado' ELSE 'Deshabilitado' END AS estado"),
+        'fecha_registro')
             ->get();
         return view('usuarios', compact('usuarios'));
     }
 
+    // Obtener todos los usuarios
     public function getUsuarios()
     {
-        $usuarios = User::select('id', 'nombre', 'rut', 'email', 'telefono', 'rol', 'estado', 'fecha_registro')
-            ->get();
+        $usuarios = User::select(
+            'id',
+            'nombre',
+            'rut',
+            'email',
+            'telefono',
+            'rol',
+            'estado',
+            DB::raw("CASE WHEN rol = 1 THEN 'Administrador' ELSE 'Vecino' END AS rol"),
+            DB::raw("CASE WHEN estado = 1 THEN 'Habilitado' ELSE 'Deshabilitado' END AS estado"),
+            'fecha_registro'
+        )
+        ->get();
+    
         return response()->json(['data' => $usuarios]);
     }
 
+    // Obtener usuario por ID
     public function getUser($id)
     {
         $usuario = User::find($id);
@@ -30,6 +49,7 @@ class UsuariosController extends Controller
         return response()->json($usuario);
     }
 
+    // Crear usuario
     public function createUser(Request $request)
     {
         try {
@@ -69,6 +89,41 @@ class UsuariosController extends Controller
         }
     }
 
+    // Actualizar usuario
+    public function update(Request $request, $id)
+    {
+        $usuario = User::find($id);
+    
+        if (!$usuario) {
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+        }
+    
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'rut' => 'required|string|unique:users,rut,' . $id,
+            'email' => 'required|email|unique:users,email,' . $id,
+            'telefono' => 'required|string',
+            'fecha_nacimiento' => 'required|date',
+            'genero' => 'required|string',
+            'rol' => 'required|integer|in:1,2',
+            'password' => 'nullable|min:6'
+        ]);
+    
+        $datos = $request->all();
+        
+        // Solo actualiza la contraseña si se proporciona
+        if (!empty($datos['password'])) {
+            $datos['password'] = bcrypt($datos['password']);
+        } else {
+            unset($datos['password']); // Elimina el campo de contraseña si está vacío
+        }
+    
+        $usuario->update($datos);
+    
+        return response()->json($usuario, 200);
+    }
+
+    // Deshabilitar usuario
     public function deshabilitarUsuario(Request $request, $id)
     {
         $usuario = User::find($id);
@@ -92,32 +147,6 @@ class UsuariosController extends Controller
             'usuario' => $usuario
         ]);
     }
-
-    // Actualizar usuario
-     public function update(Request $request, $id)
-     {
-         $usuario = User::find($id);
-
-         if (!$usuario) {
-             return response()->json(['error' => 'Usuario no encontrado'], 404);
-         }
-
-         $request->validate([
-             'name' => 'sometimes|required|string|max:255',
-             'email' => 'sometimes|required|email|unique:users,email,' . $id,
-             'telefono' => 'sometimes|required|min:9|max:9',
-             'password' => 'sometimes|required|min:6'
-         ]);
-
-         $usuario->update([
-             'name' => $request->name ?? $usuario->name,
-             'email' => $request->email ?? $usuario->email,
-             'telefono' => $request->telefono ?? $usuario->telefono,
-             'password' => $request->password ? bcrypt($request->password) : $usuario->password
-         ]);
-
-         return response()->json($usuario);
-     }
 
     //   Eliminar usuario
      public function destroy($id)

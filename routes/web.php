@@ -8,26 +8,35 @@ use App\Http\Controllers\UsuariosController;
 use App\Http\Controllers\Auth\LoginController;
 
 
-
-
-//Auth::routes();
-
-
+// vistas del login
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
+Route::get('usuarios', [UsuariosController::class, 'index'])->name('usuarios.index');
 
+
+
+// metodo post para el login y logout
 Route::post('/login', [LoginController::class, 'loginUser'])
     ->name('login.post');
 Route::post('/logout', [LoginController::class, 'logout'])
     ->name('logout');
     
 
+// rutas protegidas
 Route::middleware(['auth'])->group(function () {
-    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/', [HomeController::class, 'index'])->name('home'); 
+
+    // rutas de concatcos y canchas
     Route::get('contacto', [ContactoController::class, 'index'])->name('contacto.index');
     Route::get('canchas', [CanchasController::class, 'index'])->name('canchas.index');
-    Route::get('usuarios', [UsuariosController::class, 'index'])->name('usuarios.index');
 
+    // funciones de usuarios
     Route::post('crearUsuario', [UsuariosController::class, 'createUser'])->name('user.create');
+    Route::get('verUsuario/{id}', [UsuariosController::class, 'getUser']);
+    Route::post('editarUsuario/{id}', [UsuariosController::class, 'update']);
+    Route::get('editarUsuario/{id}', [UsuariosController::class, 'getUser']);;
+    Route::delete('eliminarUsuario/{id}', [UsuariosController::class, 'destroy'])->name('usuarios.destroy');
+
+
 });
