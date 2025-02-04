@@ -2,6 +2,8 @@
  
 @section('content')
 
+
+
 <!-- Botón para abrir el modal  -->
 <button class="btn-primary create-user-btn" onclick="openModalAgregar()">
     <i class="fas fa-plus"></i> Agregar Usuario
@@ -225,24 +227,56 @@
 
 <!-- Modal confirmación de eliminación -->
 <div id="deleteConfirmModal" class="modal">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-secundary rounded">
-                <div class="modal-title text-grey h2">
-                    Eliminar
-                </div>
-                <button type="button" class="btn-close" aria-label="Close" onclick="closeDeleteModal()"></button>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 >Eliminar Usuario</h2>
+            <span class="close" onclick="closeDeleteModal()">&times;</span>
+        </div>
+        <div class="modal-body delete-confirmation">
+            <div class="warning-icon">
+                <i class="fas fa-exclamation-triangle"></i>
             </div>
-            <div class="modal-body">
-                <p style="font-size: 18px; margin-bottom: 20px;">¿Estás seguro que deseas eliminar este usuario de forma permanente?</p>
-                <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                    <button onclick="closeDeleteModal()" class="btn-open" style="background-color: #004D99;">Cancelar</button>
-                    <button onclick="confirmarEliminacion()" class="btn-open" style="background-color: #dc3545;">Eliminar</button>
-                </div>
+            <div class="delete-message">
+                <h3>¿Estás seguro de eliminar este usuario?</h3>
+                <p>Esta acción no se puede deshacer. El usuario será eliminado permanentemente del sistema.</p>
             </div>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeDeleteModal()" class="btn btn-secondary">Cancelar</button>
+            <button onclick="confirmarEliminacion()" class="btn-delete">
+                <i class="fas fa-trash-alt"></i> Eliminar
+            </button>
         </div>
     </div>
 </div>
+
+<!-- Modal confirmación de deshabilitar -->
+<div id="dehabilitarConfirmModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Deshabilitar Usuario</h2>
+            <span class="close" onclick="closeDeshabilitarModal()">&times;</span>
+        </div>
+        <div class="modal-body disable-confirmation">
+            <div class="warning-icon" style="color: #e2ac09;">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="disable-message">
+                <h3>¿Estás seguro de deshabilitar este usuario?</h3>
+                <p>El usuario perderá temporalmente el acceso al sistema. Podrás habilitarlo nuevamente más tarde.</p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeDeshabilitarModal()" class="btn btn-secondary">Cancelar</button>
+            <button onclick="confirmarDeshabilitar()" class="btn-disable">
+                <i class="fas fa-user-slash"></i> Deshabilitar
+            </button>
+        </div>
+    </div>
+</div>
+
+
+
 
 {{-- Tabla de usuarios --}}
 <table class="user-table">
@@ -260,7 +294,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach ($usuarios as $usuario)
+        @foreach ($usuarios->where('eliminado', false) as $usuario)
         <tr class="user-table-row">
             <td class="user-table-cell">{{ $usuario->id }}</td>
             <td class="user-table-cell">{{ $usuario->nombre }}</td>
@@ -268,7 +302,7 @@
             <td class="user-table-cell">{{ $usuario->email }}</td>
             <td class="user-table-cell">{{ $usuario->telefono }}</td>
             <td class="user-table-cell">{{ $usuario->rol }}</td>
-            <td class="user-table-cell">{{ $usuario->estado = true ? 'Habilitado' : 'Deshabilitado' }}</td>
+            <td class="user-table-cell">{{ $usuario->estado == 1 ? 'Habilitado' : 'Deshabilitado' }}</td>
             <td class="user-table-cell">{{ $usuario->fecha_registro }}</td>
             <td class="user-table-cell">
                 <div class="action-buttons">
@@ -282,21 +316,21 @@
                         title="Ver usuario">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button onclick="eliminarUsuario({{ $usuario->id }})"
+                    <button onclick="mostrarConfirmacionEliminar({{ $usuario->id }})"
                         class="action-btn delete-btn"
                         title="Eliminar usuario">
                         <i class="fas fa-trash-alt"></i>
                     </button>
-                    <button onclick="deshabilitarUsuario({{ $usuario->id }})" 
+                    <button onclick="mostrarConfirmacionDeshabilitar({{ $usuario->id }})" 
                         class="action-btn toggle-btn"
                         data-estado="{{ $usuario->estado }}"
-                        title="{{ $usuario->estado === 1 ? 'Deshabilitar usuario' : 'Habilitar usuario' }}">
-                    @if($usuario->estado === 1)
-                        <i class="fas fa-user"></i>
-                    @else
-                        <i class="fas fa-user-slash"></i>
-                    @endif
-                </button>
+                        title="{{ $usuario->estado == false ? 'Habilitar usuario' : 'Deshabilitar usuario' }}">
+                        @if($usuario->estado == false)
+                            <i class="fas fa-user-slash"></i>
+                        @else
+                            <i class="fas fa-user-check"></i>
+                        @endif
+                    </button>
                 </div> 
             </td>
         </tr>
@@ -304,8 +338,6 @@
     </tbody>
 </table>
 
-
-<script src="{{ asset('js/usuarios.js') }}"></script>
 
 <style>
     /* Tabla */
@@ -547,11 +579,115 @@
         color: white;
     }
 
+    .delete-confirmation {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 20px;
+        background-color: #fff5f5;
+    }
+
+    .warning-icon {
+        font-size: 4rem;
+        color: #dc3545;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px;
+    }
+
+    .delete-message {
+        flex-grow: 1;
+    }
+
+    .delete-message h3 {
+        color: #6c757d;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    .delete-message p {
+        color: #6c757d;
+        line-height: 1.5;
+    }
+
+    .btn-delete {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-delete:hover {
+        background-color: #a71d2a;
+    }
+
+    .btn-delete i {
+        margin-right: 5px;
+    }
+
+    .text-danger {
+        color: #6c757d;
+    }
+
+    .disable-confirmation {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 20px;
+        background-color: #fff5f5;
+    }
+
+    .btn-disable {
+        background-color: #e2ac09; 
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-disable:hover {
+        background-color: #ab8206; ;
+    }
+
+    .warning-icon {
+        font-size: 4rem;
+        color: #e2ac09; /* Changed to match the disable button color */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px;
+    }
+
+    .disable-message {
+        flex-grow: 1;
+    }
+
+    .disable-message h3 {
+        color: #6c757d;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    .disable-message p {
+        color: #6c757d;
+        line-height: 1.5;
+    }
     
 
 </style>
 
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="{{ asset('js/usuarios.js') }}"></script>
 
 @endsection

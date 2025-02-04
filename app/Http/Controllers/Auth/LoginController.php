@@ -32,28 +32,25 @@ class LoginController extends Controller
 
     public function loginUser(Request $request)
     {
-        try {
-            $credentials = $request->validate([
-                'rut' => 'required',
-                'password' => 'required',
-            ]);
+        $credentials = $request->only('rut', 'password');
     
-            $credentials['estado'] = '1';
-    
-            if (Auth::attempt($credentials)) {
-                $request->session()->regenerate();
-                return redirect()->intended('/');
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+            
+            // verifica si el usario esta deshabilitado
+            if ($user->estado === false) {
+                Auth::logout();
+                return back()->withErrors([
+                    'rut' => 'Su cuenta está deshabilitada. Por favor, contacte a un administrador.'
+                ]);
             }
     
-            return back()
-                ->withErrors(['rut' => 'Las credenciales son incorrectas.'])
-                ->withInput();
-        } 
-        catch (\Throwable $th) {
-            return back()
-                ->withErrors(['error' => 'Ocurrió un error al intentar iniciar sesión.'])
-                ->withInput();
+            return redirect()->intended('/');
         }
+    
+        return back()->withErrors([
+            'rut' => 'Las credenciales proporcionadas no coinciden con nuestros registros.'
+        ]);
     }
 
     public function logout(Request $request)

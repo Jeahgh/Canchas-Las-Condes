@@ -11,10 +11,11 @@ class UsuariosController extends Controller
     // Vista de usuarios
     public function index()
     {
-        $usuarios = User::select('id', 'nombre', 'rut', 'email', 'telefono',
-        DB::raw("CASE WHEN rol = 1 THEN 'Administrador' ELSE 'Vecino' END AS rol"),
-        DB::raw("CASE WHEN estado = 1 THEN 'Habilitado' ELSE 'Deshabilitado' END AS estado"),
-        'fecha_registro')
+        $usuarios = User::where('eliminado', false)
+            ->select('id', 'nombre', 'rut', 'email', 'telefono',
+                DB::raw("CASE WHEN rol = 1 THEN 'Administrador' ELSE 'Vecino' END AS rol"),
+                DB::raw("CASE WHEN estado = 1 THEN 'Habilitado' ELSE 'Deshabilitado' END AS estado"),
+                'fecha_registro')
             ->get();
         return view('usuarios', compact('usuarios'));
     }
@@ -123,44 +124,45 @@ class UsuariosController extends Controller
         return response()->json($usuario, 200);
     }
 
-    // Deshabilitar usuario
-    public function deshabilitarUsuario(Request $request, $id)
+
+
+    //   Eliminar usuario
+    public function destroy($id)
     {
         $usuario = User::find($id);
-
+    
         if (!$usuario) {
             return response()->json(['error' => 'Usuario no encontrado'], 404);
         }
-
-        //  Cambiamos el estado al opuesto del actual
-        $nuevoEstado = $usuario->estado === 1 ? 0 : 1;
-        
+    
+        // Marca como eliminado
         $usuario->update([
-            'estado' => $nuevoEstado
+            'eliminado' => true
         ]);
-
-        $mensaje = $nuevoEstado === 0 ? 'Usuario deshabilitado correctamente' : 'Usuario habilitado correctamente';
-
+    
         return response()->json([
-            'message' => $mensaje,
-            'estado' => $nuevoEstado,   //Añadimos el nuevo estado a la respuesta
-            'usuario' => $usuario
+            'message' => 'Usuario eliminado correctamente',
+            'success' => true
         ]);
     }
-
     //   Eliminar usuario
-     public function destroy($id)
-     {
-         $usuario = User::find($id);
-
-         if (!$usuario) {
-             return response()->json(['error' => 'Usuario no encontrado'], 404);
-         }
+    public function deshabilitarUsuario(Request $request, $id)
+    {
+        $usuario = User::find($id);
     
-         $usuario->update([
-             'eliminado' => true
-         ]);
+        if (!$usuario) {
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+        }
     
-         return response()->json(['message' => 'Usuario eliminado correctamente']);
-     }
+        // Cambiar el estado del usuario
+        $usuario->update([
+            'estado' => !$usuario->estado
+        ]);
+    
+        return response()->json([
+            'message' => $usuario->estado ? 'Usuario habilitado correctamente' : 'Usuario deshabilitado correctamente',
+            'success' => true,
+            'estado' => $usuario->estado
+        ]);
+    }
 }

@@ -26,23 +26,82 @@ function closeModalVer() {
     document.getElementById("userModalVer").style.display = "none"; 
 }
 
-// Confirmar eliminación
+
+// Modal de confirmación de eliminación
 let usuarioIdAEliminar = null;
+function closeDeleteModal() {
+    document.getElementById("deleteConfirmModal").style.display = "none";
+}
 function mostrarConfirmacionEliminar(id) {
     usuarioIdAEliminar = id;
     document.getElementById("deleteConfirmModal").style.display = "block";
 }
-function closeDeleteModal() {
-    document.getElementById("deleteConfirmModal").style.display = "none";
+async function confirmarEliminacion() {
+    if (usuarioIdAEliminar) {
+        try {
+            await axios.delete(`eliminarUsuario/${usuarioIdAEliminar}`);
+            
+            mostrarMensaje('Usuario eliminado correctamente');
+            
+            setTimeout(() => {
+                location.reload();
+            }, 3000);  
+            
+            closeDeleteModal();
+        } catch (error) {
+            console.error("Error al eliminar:", error);
+            mostrarMensaje('Error al eliminar usuario', 'error');
+        }
+    }
+}
+
+
+//Modal de confirmación de deshabilitación
+let usuarioIdADeshabilitar = null;
+function closeDeshabilitarModal() {
+    document.getElementById("dehabilitarConfirmModal").style.display = "none";
+}
+function mostrarConfirmacionDeshabilitar(id) {
+    usuarioIdADeshabilitar = id;
+    document.getElementById("dehabilitarConfirmModal").style.display = "block";
+}
+
+async function confirmarDeshabilitar() {
+    if (!usuarioIdADeshabilitar) return;
+
+    try {
+        const response = await axios.post(`/deshabilitarUsuario/${usuarioIdADeshabilitar}`);
+        const { message, estado } = response.data;
+
+        // Mostrar mensaje de éxito
+        mostrarMensaje(message);
+
+        // Buscar botón y actualizar estado
+        const boton = document.querySelector(`button[onclick="mostrarConfirmacionDeshabilitar(${usuarioIdADeshabilitar})"]`);
+        if (boton) {
+            boton.setAttribute('data-estado', estado);
+            boton.setAttribute('title', estado ? 'Deshabilitar usuario' : 'Habilitar usuario');
+            boton.innerHTML = estado ? '<i class="fas fa-user-check"></i>' : '<i class="fas fa-user-slash"></i>';
+        }
+
+        // Actualizar el estado en la tabla
+        const celdaEstado = boton.closest('tr')?.querySelector('.user-table-cell:nth-child(7)');
+        if (celdaEstado) {
+            celdaEstado.textContent = estado ? 'Habilitado' : 'Deshabilitado';
+        }
+
+        // Cerrar el modal
+        closeDeshabilitarModal();
+    } catch (error) {
+        console.error("Error al deshabilitar:", error);
+        mostrarMensaje('Error al deshabilitar usuario', 'error');
+    }
 }
 
 
 
+// FUNCIONES CRUD 
 
-
-
-// FUNCIONES CRUD Y DEHASHABILITAR USUARIO
-let usuarioIdEditando = null;
 
 // Cerrar el modal si se hace clic fuera de él
 window.onclick = function(event) {
@@ -99,7 +158,6 @@ async function cargarUsuarios() {
         let data = response.data;
         console.log("Esta es mi informacion:: ",data);
         
-        // actualizarTablaUsuarios(usuarios);
     } catch (error) {
         console.error("Error al cargar usuarios:", error);
     }
@@ -156,43 +214,47 @@ async function verUsuario(id) {
 }   
 
 // Función para deshabilitar usuario
-async function deshabilitarUsuario(id) {
-    try {
-        const response = await axios.post(`/deshabilitarUsuario/${id}`);
-        alert(response.data.message);
-        window.location.reload(); // Recarga inmediata después de cerrar la alerta
-    } catch (error) {
-        console.error("Error al cambiar estado del usuario:", error);
-        alert("Error al cambiar el estado del usuario");
-    }
-}
 
-// Funciones para eliminar usuario
-async function eliminarUsuario(id) {
-    if (confirm('¿Estás seguro de eliminar este usuario?')) {
-        try {
-            await axios.delete(`/eliminarUsuario/${id}`);
-        } catch (error) {
-            console.error("Error al eliminar:", error);
-        }
-    }
-}
 
-async function confirmarEliminacion() {
-    if (usuarioIdAEliminar) {
-        try {
-            await axios.delete(`eliminarUsuario/${usuarioIdAEliminar}`);
-            closeDeleteModal();
-            location.reload(); // Recargar la página para reflejar los cambios
-        } catch (error) {
-            console.error("Error al eliminar:", error);
-            alert("No se pudo eliminar el usuario");
-        }
+function mostrarMensaje(mensaje, tipo = 'success') {
+    // Remover cualquier mensaje anterior
+    const mensajeAnterior = document.getElementById('mensaje-notificacion');
+    if (mensajeAnterior) {
+        mensajeAnterior.remove();
     }
-}
 
-function eliminarUsuario(id) {
-    mostrarConfirmacionEliminar(id);
+    // Crear elemento de mensaje
+    const mensajeElemento = document.createElement('div');
+    mensajeElemento.id = 'mensaje-notificacion';
+    mensajeElemento.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: ${tipo === 'success' ? '#28a745' : '#dc3545'};
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        z-index: 1000;
+        text-align: center;
+    `;
+
+    mensajeElemento.textContent = mensaje;
+
+    // Agregar al body
+    document.body.appendChild(mensajeElemento);
+
+    // Ocultar después de 3 segundos
+    setTimeout(() => {
+        mensajeElemento.style.transition = 'opacity 0.5s';
+        mensajeElemento.style.opacity = '0';
+        
+        // Remover del DOM después de la transición
+        setTimeout(() => {
+            mensajeElemento.remove();
+        }, 500);
+    }, 3000);
 }
 
     

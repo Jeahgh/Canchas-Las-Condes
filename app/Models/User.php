@@ -59,7 +59,8 @@ class User extends Authenticatable
         'genero',
         'rol',
         'password',
-        'estado'
+        'estado',
+        'eliminado'
     ];
 
     /**

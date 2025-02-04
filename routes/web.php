@@ -12,7 +12,7 @@ use App\Http\Controllers\Auth\LoginController;
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
-Route::get('usuarios', [UsuariosController::class, 'index'])->name('usuarios.index');
+
 
 
 
@@ -24,7 +24,7 @@ Route::post('/logout', [LoginController::class, 'logout'])
     
 
 // rutas protegidas
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'check.status'])->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('home'); 
 
     // rutas de concatcos y canchas
@@ -32,11 +32,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('canchas', [CanchasController::class, 'index'])->name('canchas.index');
 
     // funciones de usuarios
+    Route::get('/getUsuarios', [UsuariosController::class, 'getUsuarios']);
+    Route::get('usuarios', [UsuariosController::class, 'index'])->name('usuarios.index');
     Route::post('crearUsuario', [UsuariosController::class, 'createUser'])->name('user.create');
     Route::get('verUsuario/{id}', [UsuariosController::class, 'getUser']);
     Route::post('editarUsuario/{id}', [UsuariosController::class, 'update']);
     Route::get('editarUsuario/{id}', [UsuariosController::class, 'getUser']);;
     Route::delete('eliminarUsuario/{id}', [UsuariosController::class, 'destroy'])->name('usuarios.destroy');
-
-
+    Route::post('deshabilitarUsuario/{id}', [UsuariosController::class, 'deshabilitarUsuario']);
 });
