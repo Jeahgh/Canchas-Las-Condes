@@ -15,6 +15,7 @@ class UsuariosController extends Controller
             ->select('id', 'nombre', 'rut', 'email', 'telefono',
                 DB::raw("CASE WHEN rol = 1 THEN 'Administrador' ELSE 'Vecino' END AS rol"),
                 DB::raw("CASE WHEN estado = 1 THEN 'Habilitado' ELSE 'Deshabilitado' END AS estado"),
+                'estado',
                 'fecha_registro')
             ->get();
         return view('usuarios', compact('usuarios'));
@@ -164,5 +165,31 @@ class UsuariosController extends Controller
             'success' => true,
             'estado' => $usuario->estado
         ]);
+    }
+
+    // Filtrar usuarios
+    public function filtrarUsuarios(Request $request)
+    {
+        $query = User::where('eliminado', false);
+
+        if ($request->nombre) {
+            $query->where('nombre', 'LIKE', '%' . $request->nombre . '%');
+        }
+
+        if ($request->rut) {
+            $query->where('rut', 'LIKE', '%' . $request->rut . '%');
+        }
+
+        if ($request->rol) {
+            $query->where('rol', $request->rol);
+        }
+
+        if ($request->estado !== null && $request->estado !== '') {
+            $query->where('estado', $request->estado);
+        }
+
+        $usuarios = $query->get();
+
+        return response()->json($usuarios);
     }
 }

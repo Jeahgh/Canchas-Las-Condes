@@ -275,72 +275,108 @@
     </div>
 </div>
 
+<!-- Filtros de búsqueda -->
+<div class="filter-container">
+    <input type="text" id="nombreFiltro" placeholder="Buscar por nombre">
+    <input type="text" id="rutFiltro" placeholder="Buscar por RUT">
+
+    <select id="rolFiltro">
+        <option value="">Filtrar por rol</option>
+        <option value="1">Administrador</option>
+        <option value="2">Vecino</option>
+    </select>
+
+    <select id="estadoFiltro">
+        <option value="">Filtrar por estado</option>
+        <option value="1">Habilitado</option>
+        <option value="0">Deshabilitado</option>
+    </select>
+
+    <button onclick="filtrarUsuarios()">Filtrar</button>
+</div>
+
+<!-- Tabla de usuarios -->
+<div class="table-container">
+    {{-- Tabla de usuarios --}}
+    <table class="user-table">
+        <thead>
+            <tr>
+                <th class="user-table-th">ID</th>
+                <th class="user-table-th">Nombre</th>
+                <th class="user-table-th">Rut</th>
+                <th class="user-table-th">Correo</th>
+                <th class="user-table-th">Teléfono</th>
+                <th class="user-table-th">Rol</th>
+                <th class="user-table-th">Estado</th>
+                <th class="user-table-th">Última Conexión</th>
+                <th class="user-table-th">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($usuarios->where('eliminado', false) as $usuario)
+            <tr class="user-table-row">
+                <td class="user-table-cell">{{ $usuario->id }}</td>
+                <td class="user-table-cell">{{ $usuario->nombre }}</td>
+                <td class="user-table-cell">{{ $usuario->rut }}</td>
+                <td class="user-table-cell">{{ $usuario->email }}</td>
+                <td class="user-table-cell">{{ $usuario->telefono }}</td>
+                <td class="user-table-cell">{{ $usuario->rol }}</td>
+                <td class="user-table-cell">{{ $usuario->estado == 1 ? 'Habilitado' : 'Deshabilitado' }}</td>
+                <td class="user-table-cell">{{ $usuario->fecha_registro }}</td>
+                <td class="user-table-cell">
+                    <div class="action-buttons">
+                        <button onclick="editarUsuario({{ $usuario->id }})" 
+                            class="action-btn edit-btn"
+                            title="Editar usuario">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="verUsuario({{ $usuario->id }})"
+                            class="action-btn view-btn"
+                            title="Ver usuario">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="mostrarConfirmacionEliminar({{ $usuario->id }})"
+                            class="action-btn delete-btn"
+                            title="Eliminar usuario">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                        <button onclick="mostrarConfirmacionDeshabilitar({{ $usuario->id }})" 
+                            class="action-btn toggle-btn"
+                            data-estado="{{ $usuario->estado }}"
+                            title="{{ $usuario->estado == 0 ? 'Habilitar usuario' : 'Deshabilitar usuario' }}">
+                            @if($usuario->estado == 0)
+                                <i class="fas fa-user-slash"></i>
+                            @else
+                                <i class="fas fa-user-check"></i>
+                            @endif
+                        </button>
+                    </div> 
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
 
 
 
-{{-- Tabla de usuarios --}}
-<table class="user-table">
-    <thead>
-        <tr>
-            <th class="user-table-th">ID</th>
-            <th class="user-table-th">Nombre</th>
-            <th class="user-table-th">Rut</th>
-            <th class="user-table-th">Correo</th>
-            <th class="user-table-th">Teléfono</th>
-            <th class="user-table-th">Rol</th>
-            <th class="user-table-th">Estado</th>
-            <th class="user-table-th">Última Conexión</th>
-            <th class="user-table-th">Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach ($usuarios->where('eliminado', false) as $usuario)
-        <tr class="user-table-row">
-            <td class="user-table-cell">{{ $usuario->id }}</td>
-            <td class="user-table-cell">{{ $usuario->nombre }}</td>
-            <td class="user-table-cell">{{ $usuario->rut }}</td>
-            <td class="user-table-cell">{{ $usuario->email }}</td>
-            <td class="user-table-cell">{{ $usuario->telefono }}</td>
-            <td class="user-table-cell">{{ $usuario->rol }}</td>
-            <td class="user-table-cell">{{ $usuario->estado == 1 ? 'Habilitado' : 'Deshabilitado' }}</td>
-            <td class="user-table-cell">{{ $usuario->fecha_registro }}</td>
-            <td class="user-table-cell">
-                <div class="action-buttons">
-                    <button onclick="editarUsuario({{ $usuario->id }})" 
-                        class="action-btn edit-btn"
-                        title="Editar usuario">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button onclick="verUsuario({{ $usuario->id }})"
-                        class="action-btn view-btn"
-                        title="Ver usuario">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button onclick="mostrarConfirmacionEliminar({{ $usuario->id }})"
-                        class="action-btn delete-btn"
-                        title="Eliminar usuario">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                    <button onclick="mostrarConfirmacionDeshabilitar({{ $usuario->id }})" 
-                        class="action-btn toggle-btn"
-                        data-estado="{{ $usuario->estado }}"
-                        title="{{ $usuario->estado == false ? 'Habilitar usuario' : 'Deshabilitar usuario' }}">
-                        @if($usuario->estado == false)
-                            <i class="fas fa-user-slash"></i>
-                        @else
-                            <i class="fas fa-user-check"></i>
-                        @endif
-                    </button>
-                </div> 
-            </td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
 
-
+{{-- estilos --}}
 <style>
     /* Tabla */
+
+    .table-container {
+        max-height: 70vh; /* ajusta esta altura según necesites */
+        overflow-y: auto;
+        margin-top: 20px;
+    }
+
+    .user-table thead {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
     .user-table {
         width: 100%;
         border-collapse: collapse;
@@ -682,6 +718,83 @@
         color: #6c757d;
         line-height: 1.5;
     }
+
+    /* Contenedor de filtros */
+.filter-container {
+    background-color: #f5f5f5;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para los inputs de filtro */
+.filter-container input {
+    padding: 8px 12px;
+    border: 1px solid #dbdbdb;
+    border-radius: 4px;
+    font-size: 14px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-container input:focus {
+    outline: none;
+    border-color: #181f47;
+    box-shadow: 0 0 0 2px rgba(24, 31, 71, 0.2);
+}
+
+/* Estilos para los selects de filtro */
+.filter-container select {
+    padding: 8px 12px;
+    border: 1px solid #dbdbdb;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+    cursor: pointer;
+    flex: 1;
+    min-width: 150px;
+}
+
+.filter-container select:focus {
+    outline: none;
+    border-color: #181f47;
+    box-shadow: 0 0 0 2px rgba(24, 31, 71, 0.2);
+}
+
+/* Botón de filtrar */
+.filter-container button {
+    padding: 8px 20px;
+    background-color: #181f47;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.filter-container button:hover {
+    background-color: #0e0d49;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .filter-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .filter-container input,
+    .filter-container select,
+    .filter-container button {
+        width: 100%;
+        min-width: unset;
+    }
+}
     
 
 </style>

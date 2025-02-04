@@ -40,4 +40,5 @@ Route::middleware(['auth', 'check.status'])->group(function () {
     Route::get('editarUsuario/{id}', [UsuariosController::class, 'getUser']);;
     Route::delete('eliminarUsuario/{id}', [UsuariosController::class, 'destroy'])->name('usuarios.destroy');
     Route::post('deshabilitarUsuario/{id}', [UsuariosController::class, 'deshabilitarUsuario']);
+    Route::post('/filtrarUsuarios', [UsuariosController::class, 'filtrarUsuarios']);
 });

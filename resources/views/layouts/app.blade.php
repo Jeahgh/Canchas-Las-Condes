@@ -5,9 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Canchas Las Condes</title>
 
+
+    
+    {{-- estilos generales de la página  --}}
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}"> 
+
+</head>
+<body>
+
+
     {{-- header con inicio de sesión --}}
     @if(Auth::check())
     <header class="nav-header">
+
+
+
+        
         <div class="user-menu">
             <span>Hola, {{ Auth::user()->nombre }}</span>
             <div class="user-icon">
@@ -24,21 +37,18 @@
         </div>   
     </header>
     @endif
-    
-    {{-- estilos generales de la página  --}}
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}"> 
 
-</head>
-<body>
 
-    {{-- clase sidebar y todos los botones --}}
-    <div class="sidebar">
+    {{-- <div class="main-container"> --}}
+    <div class="sidebar" id="sidebar">
+
+
         <a href="{{ route('home') }}">
             <img src="{{ asset('imagenes/logo-las-condes-blanco.avif') }}" 
             alt="Logo Las Condes" 
             class="img-fluid logo-centered">
         </a>
-  
+
         <nav class="menu-links">
             <a href="{{ route('home') }}"><i class="fas fa-home"></i> Inicio</a>
             <a href="{{ route('contacto.index') }}"><i class="fas fa-envelope"></i> Contáctanos</a>
@@ -47,6 +57,10 @@
         </nav>
 
     </div>
+    <div class="content">
+        @yield('content')
+    </div>
+
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -58,8 +72,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     {{-- En esta parte va toda la información --}}
-    <div class="content">
-        @yield('content')
-    </div>
+
 </body>
 </html>
