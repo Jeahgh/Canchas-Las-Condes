@@ -5,13 +5,13 @@
 
 
 <!-- Botón para abrir el modal  -->
-<button class="btn-primary create-user-btn" onclick="openModalAgregar()">
+<button class="create-user-btn" onclick="openModalAgregar()">
     <i class="fas fa-plus"></i> Agregar Usuario
 </button>
 
 <!-- Modal Agregar usuario-->
 <div id="userModal" class="modal">
-    <div class="modal-content">
+    <div class="usuarios-modal-content">
         <div class="modal-header">
             <h2>Crear Usuario</h2>
             <span class="close" onclick="closeModalAgregar()">&times;</span>
@@ -75,7 +75,7 @@
             
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeModalAgregar()">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Guardar</button>
+                <button type="submit" class="btn btn text-white" style="background-color: #181f47;">Guardar</button>
             </div>
         </form>
     </div>
@@ -83,7 +83,7 @@
 
  <!-- Modal editar usuario-->
 <div id="userModalEdit" class="modal">
-    <div class="modal-content">
+    <div class="usuarios-modal-content">
         <div class="modal-header">
             <h2>Editar Usuario</h2>
             <span class="close" onclick="closeModalEdit()">&times;</span>
@@ -147,7 +147,7 @@
             
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeModalEditar()">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Guardar</button>
+                <button type="submit" class="btn btn text-white" style="background-color: #181f47;">Guardar</button>
             </div>
         </form>
     </div>
@@ -155,7 +155,7 @@
 
  <!-- Modal ver usuario-->
 <div id="userModalVer" class="modal">
-    <div class="modal-content">
+    <div class="usuarios-modal-content">
         <div class="modal-header">
             <h2>Ver Usuario</h2>
             <span class="close" onclick="closeModalVer()">&times;</span>
@@ -218,8 +218,7 @@
             </div>
             
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModalVer()">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Guardar</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModalVer()">Cerrar</button>
             </div>
         </form>
     </div>
@@ -227,7 +226,7 @@
 
 <!-- Modal confirmación de eliminación -->
 <div id="deleteConfirmModal" class="modal">
-    <div class="modal-content">
+    <div class="usuarios-modal-content">
         <div class="modal-header">
             <h2 >Eliminar Usuario</h2>
             <span class="close" onclick="closeDeleteModal()">&times;</span>
@@ -252,7 +251,7 @@
 
 <!-- Modal confirmación de deshabilitar -->
 <div id="dehabilitarConfirmModal" class="modal">
-    <div class="modal-content">
+    <div class="usuarios-modal-content">
         <div class="modal-header">
             <h2>Deshabilitar Usuario</h2>
             <span class="close" onclick="closeDeshabilitarModal()">&times;</span>
@@ -261,14 +260,14 @@
             <div class="warning-icon" style="color: #e2ac09;">
                 <i class="fas fa-exclamation-triangle"></i>
             </div>
-            <div class="disable-message">
+            <div class="disable-message" id="disable-content">
                 <h3>¿Estás seguro de deshabilitar este usuario?</h3>
                 <p>El usuario perderá temporalmente el acceso al sistema. Podrás habilitarlo nuevamente más tarde.</p>
             </div>
         </div>
         <div class="modal-footer">
             <button onclick="closeDeshabilitarModal()" class="btn btn-secondary">Cancelar</button>
-            <button onclick="confirmarDeshabilitar()" class="btn-disable">
+            <button id="disable-button" onclick="confirmarDeshabilitar()" class="btn-disable">
                 <i class="fas fa-user-slash"></i> Deshabilitar
             </button>
         </div>
@@ -296,7 +295,7 @@
 </div>
 
 <!-- Tabla de usuarios -->
-<div class="table-container">
+<div class="usuarios-table-container">
     {{-- Tabla de usuarios --}}
     <table class="user-table">
         <thead>
@@ -313,7 +312,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($usuarios->where('eliminado', false) as $usuario)
+            @foreach ($usuarios as $usuario)
             <tr class="user-table-row">
                 <td class="user-table-cell">{{ $usuario->id }}</td>
                 <td class="user-table-cell">{{ $usuario->nombre }}</td>
@@ -323,30 +322,32 @@
                 <td class="user-table-cell">{{ $usuario->rol }}</td>
                 <td class="user-table-cell">{{ $usuario->estado == 1 ? 'Habilitado' : 'Deshabilitado' }}</td>
                 <td class="user-table-cell">{{ $usuario->fecha_registro }}</td>
+                
+
                 <td class="user-table-cell">
                     <div class="action-buttons">
                         <button onclick="editarUsuario({{ $usuario->id }})" 
-                            class="action-btn edit-btn"
+                            class="action-btn usuarios-edit-btn"
                             title="Editar usuario">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button onclick="verUsuario({{ $usuario->id }})"
-                            class="action-btn view-btn"
+                            class="action-btn usuarios-view-btn"
                             title="Ver usuario">
                             <i class="fas fa-eye"></i>
                         </button>
                         <button onclick="mostrarConfirmacionEliminar({{ $usuario->id }})"
-                            class="action-btn delete-btn"
+                            class="action-btn usuarios-delete-btn"
                             title="Eliminar usuario">
                             <i class="fas fa-trash-alt"></i>
                         </button>
                         <button onclick="mostrarConfirmacionDeshabilitar({{ $usuario->id }})" 
-                            class="action-btn toggle-btn"
+                            class="{{ $usuario->estado == false ? 'action-btn toggle-btn disabled' : 'action-btn toggle-btn enabled' }}"
                             data-estado="{{ $usuario->estado }}"
-                            title="{{ $usuario->estado == 0 ? 'Habilitar usuario' : 'Deshabilitar usuario' }}">
-                            @if($usuario->estado == 0)
+                            title="{{ $usuario->estado == false ? 'Habilitar usuario' : 'Deshabilitar usuario' }}">
+                            @if($usuario->estado == false)
                                 <i class="fas fa-user-slash"></i>
-                            @else
+                            @elseif($usuario->estado == true)
                                 <i class="fas fa-user-check"></i>
                             @endif
                         </button>
@@ -365,11 +366,11 @@
 <style>
     /* Tabla */
 
-    .table-container {
-        max-height: 70vh; /* ajusta esta altura según necesites */
+    .usuarios-table-container {
+        max-height: 65vh; 
         overflow-y: auto;
-        margin-top: 20px;
-    }
+        margin-top: 10px;
+    } 
 
     .user-table thead {
         position: sticky;
@@ -400,28 +401,33 @@
         }
 
     /* Botones de Acción */
-    .btn {
+    .usuarios-btn {
         display: inline-block;
         padding: 8px 16px;
         border-radius: 4px;
         text-decoration: none;
         font-weight: bold;
         transition: background-color 0.3s ease;
-        }
+        } 
 
-    .btn-primary {
-        background-color: #00d1b2;
+    .usuarios-btn-primary {
+        background-color: #181f47;
         color: white;
-        }
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+    } 
 
-    .btn-primary:hover {
-        background-color: #00b29e;
-        }
+    .usuarios-btn-primary:hover {
+        background-color: #0e0d49; /* Un tono más oscuro para el hover */
+    }
 
-    .btn-danger {
+    .usuarios-btn-danger {
         background-color: #ff3860;
         color: white;
-        }
+        } 
 
     .btn-danger:hover {
         background-color: #f14668;
@@ -441,12 +447,12 @@
         }
 
     .user-info p {
-    margin-bottom: 4px;
+        margin-bottom: 4px;
     }
 
 
-        /* Contenedor principal de botones */
-        .action-buttons {
+    /* Contenedor principal de botones */
+    .action-buttons {
         display: flex;          /* Hace que los botones se alineen horizontalmente */
         gap: 5px;              /* Espacio uniforme entre botones */
         justify-content: center; /* Centra los botones horizontalmente */
@@ -472,26 +478,28 @@
     }
 
     /* Colores específicos para cada acción */
-    .edit-btn {
+    .usuarios-edit-btn {
         background-color: #e2ac09; /* Azul para editar */
     }
 
-    .view-btn {
+    .usuarios-view-btn {
         background-color: #62676b; /* Azul oscuro para ver */
     }
 
-    .delete-btn {
+    .usuarios-delete-btn {
         background-color: #dc3545; /* Rojo para eliminar */
     }
 
-    /* Colores diferentes para habilitar/deshabilitar */
-    .toggle-btn[data-estado="1"] {
-        background-color: #28a745; /* Verde para usuario habilitado */
+
+    .action-btn.disabled {
+        background-color: #e2ac09 !important;
     }
 
-    .toggle-btn[data-estado="0"] {
-        background-color: #e2ac09; /* Amarillo para usuario deshabilitado */
+    .action-btn.enabled {
+        background-color: #28a745 !important;
     }
+
+
 
     /* Estilo para los íconos */
     .action-btn i {
@@ -505,7 +513,7 @@
     .create-user-btn {
         margin: 20px 0;
         padding: 10px 20px;
-        background-color: #00d1b2;
+        background-color: #181f47;
         color: white;
         border: none;
         border-radius: 4px;
@@ -515,7 +523,7 @@
         gap: 8px;
     }
 
-    .modal {
+    .usuarios-modal {
         display: none;
         position: fixed;
         z-index: 1000;
@@ -526,7 +534,7 @@
         background-color: rgba(0,0,0,0.5);
     }
 
-    .modal-content {
+    .usuarios-modal-content {
         background-color: #fff;
         margin: 5% auto;
         width: 80%;
@@ -610,10 +618,6 @@
         color: white;
     }
 
-    .btn-primary {
-        background-color: #181f47;
-        color: white;
-    }
 
     .delete-confirmation {
         display: flex;
@@ -720,81 +724,81 @@
     }
 
     /* Contenedor de filtros */
-.filter-container {
-    background-color: #f5f5f5;
-    padding: 20px;
-    border-radius: 8px;
-    margin: 20px 0;
-    display: flex;
-    gap: 15px;
-    align-items: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Estilos para los inputs de filtro */
-.filter-container input {
-    padding: 8px 12px;
-    border: 1px solid #dbdbdb;
-    border-radius: 4px;
-    font-size: 14px;
-    flex: 1;
-    min-width: 200px;
-}
-
-.filter-container input:focus {
-    outline: none;
-    border-color: #181f47;
-    box-shadow: 0 0 0 2px rgba(24, 31, 71, 0.2);
-}
-
-/* Estilos para los selects de filtro */
-.filter-container select {
-    padding: 8px 12px;
-    border: 1px solid #dbdbdb;
-    border-radius: 4px;
-    font-size: 14px;
-    background-color: white;
-    cursor: pointer;
-    flex: 1;
-    min-width: 150px;
-}
-
-.filter-container select:focus {
-    outline: none;
-    border-color: #181f47;
-    box-shadow: 0 0 0 2px rgba(24, 31, 71, 0.2);
-}
-
-/* Botón de filtrar */
-.filter-container button {
-    padding: 8px 20px;
-    background-color: #181f47;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.3s ease;
-}
-
-.filter-container button:hover {
-    background-color: #0e0d49;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
     .filter-container {
-        flex-direction: column;
-        gap: 10px;
+        background-color: #f5f5f5;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-    
-    .filter-container input,
-    .filter-container select,
+
+    /* Estilos para los inputs de filtro */
+    .filter-container input {
+        padding: 8px 12px;
+        border: 1px solid #dbdbdb;
+        border-radius: 4px;
+        font-size: 14px;
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .filter-container input:focus {
+        outline: none;
+        border-color: #181f47;
+        box-shadow: 0 0 0 2px rgba(24, 31, 71, 0.2);
+    }
+
+    /* Estilos para los selects de filtro */
+    .filter-container select {
+        padding: 8px 12px;
+        border: 1px solid #dbdbdb;
+        border-radius: 4px;
+        font-size: 14px;
+        background-color: white;
+        cursor: pointer;
+        flex: 1;
+        min-width: 150px;
+    }
+
+    .filter-container select:focus {
+        outline: none;
+        border-color: #181f47;
+        box-shadow: 0 0 0 2px rgba(24, 31, 71, 0.2);
+    }
+
+    /* Botón de filtrar */
     .filter-container button {
-        width: 100%;
-        min-width: unset;
+        padding: 8px 20px;
+        background-color: #181f47;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
     }
-}
+
+    .filter-container button:hover {
+        background-color: #0e0d49;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .filter-container {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .filter-container input,
+        .filter-container select,
+        .filter-container button {
+            width: 100%;
+            min-width: unset;
+        }
+    }
     
 
 </style>

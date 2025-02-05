@@ -79,17 +79,17 @@
 
 <style>
     .text-navy {
-        color: #2A2859;
+        color: #181f47;
     }
 
     .btn-primary {
-        background-color: #2A2859;
-        border-color: #2A2859;
+        background-color: #181f47;
+        border-color: #181f47;
     }
 
     .btn-primary:hover {
-        background-color: #1e1d40;
-        border-color: #1e1d40;
+        background-color: #0e0d49;
+        border-color: #0e0d49;
     }
 
     .img-custom {

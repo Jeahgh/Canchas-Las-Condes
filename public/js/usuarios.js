@@ -63,6 +63,24 @@ function closeDeshabilitarModal() {
 }
 function mostrarConfirmacionDeshabilitar(id) {
     usuarioIdADeshabilitar = id;
+    
+    // Obtén el estado actual del usuario correctamente
+    const botonEstado = document.querySelector(`.action-btn.toggle-btn[onclick="mostrarConfirmacionDeshabilitar(${id})"]`);
+    const estadoActual = botonEstado.classList.contains('enabled');
+    
+    const tituloModal = document.getElementById('disable-content');
+    const botonModal = document.getElementById('disable-button');
+    
+    if (estadoActual) {
+        // Usuario habilitado, preparar para deshabilitar
+        tituloModal.innerHTML = '<h3>¿Estás seguro de deshabilitar este usuario?</h3>';
+        botonModal.innerHTML = '<i class="fas fa-user-slash"></i> Deshabilitar';
+    } else {
+        // Usuario deshabilitado, preparar para habilitar
+        tituloModal.innerHTML = '<h3>¿Estás seguro de habilitar este usuario?</h3>';
+        botonModal.innerHTML = '<i class="fas fa-user-check"></i> Habilitar';
+    }
+    
     document.getElementById("dehabilitarConfirmModal").style.display = "block";
 }
 
@@ -76,23 +94,7 @@ async function confirmarDeshabilitar() {
         // Mostrar mensaje de éxito
         mostrarMensaje(message);
 
-        // Buscar botón y actualizar estado
-        const boton = document.querySelector(`button[onclick="mostrarConfirmacionDeshabilitar(${usuarioIdADeshabilitar})"]`);
-        if (boton) {
-            // Actualizar data-estado y clase del botón
-            boton.setAttribute('data-estado', estado ? "1" : "0");
-            boton.setAttribute('title', estado ? 'Deshabilitar usuario' : 'Habilitar usuario');
-            boton.innerHTML = estado ? '<i class="fas fa-user-check"></i>' : '<i class="fas fa-user-slash"></i>';
-            
-            // Forzar actualización de estilos
-            boton.className = `action-btn toggle-btn`;
-        }
-
-        // Actualizar el estado en la tabla
-        const celdaEstado = boton.closest('tr')?.querySelector('.user-table-cell:nth-child(7)');
-        if (celdaEstado) {
-            celdaEstado.textContent = estado ? 'Habilitado' : 'Deshabilitado';
-        }
+        location.reload();
 
         // Cerrar el modal
         closeDeshabilitarModal();
@@ -217,7 +219,6 @@ async function verUsuario(id) {
     }
 }   
 
-// Función para deshabilitar usuario
 
 
 function mostrarMensaje(mensaje, tipo = 'success') {
@@ -270,16 +271,13 @@ async function filtrarUsuarios() {
         const rol = document.getElementById('rolFiltro').value;
         const estado = document.getElementById('estadoFiltro').value;
 
-        // Realizar petición al servidor
-        const response = await axios.post('/filtrarUsuarios', {
-            nombre: nombre,
-            rut: rut,
-            rol: rol,
-            estado: estado
+        // Realizar petición al servidor con los parámetros de filtro
+        const response = await axios.get('/usuarios', {
+            params: { nombre, rut, rol, estado }
         });
 
-        // Actualizar la tabla con los resultados
-        actualizarTabla(response.data);
+        // La respuesta debe ser un HTML completo que reemplazará el contenido actual
+        document.body.innerHTML = response.data;
 
     } catch (error) {
         console.error("Error al filtrar:", error);
@@ -287,54 +285,4 @@ async function filtrarUsuarios() {
     }
 }
 
-function actualizarTabla(usuarios) {
-    const tbody = document.querySelector('.user-table tbody');
-    tbody.innerHTML = ''; // Limpiar tabla
-
-    usuarios.forEach(usuario => {
-        const tr = document.createElement('tr');
-        tr.className = 'user-table-row';
-        
-        // Convertir el estado a 1/0 si es necesario
-        const estadoValue = typeof usuario.estado === 'boolean' ? (usuario.estado ? 1 : 0) : usuario.estado;
-        
-        tr.innerHTML = `
-            <td class="user-table-cell">${usuario.id}</td>
-            <td class="user-table-cell">${usuario.nombre}</td>
-            <td class="user-table-cell">${usuario.rut}</td>
-            <td class="user-table-cell">${usuario.email}</td>
-            <td class="user-table-cell">${usuario.telefono}</td>
-            <td class="user-table-cell">${usuario.rol}</td>
-            <td class="user-table-cell">${estadoValue == 1 ? 'Habilitado' : 'Deshabilitado'}</td>
-            <td class="user-table-cell">${usuario.fecha_registro}</td>
-            <td class="user-table-cell">
-                <div class="action-buttons">
-                    <button onclick="editarUsuario(${usuario.id})" 
-                        class="action-btn edit-btn" 
-                        title="Editar usuario">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button onclick="verUsuario(${usuario.id})" 
-                        class="action-btn view-btn" 
-                        title="Ver usuario">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button onclick="mostrarConfirmacionEliminar(${usuario.id})" 
-                        class="action-btn delete-btn" 
-                        title="Eliminar usuario">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                    <button onclick="mostrarConfirmacionDeshabilitar(${usuario.id})" 
-                        class="action-btn toggle-btn" 
-                        data-estado="${estadoValue}"
-                        style="background-color: ${estadoValue == 1 ? '#28a745' : '#e2ac09'}"
-                        title="${estadoValue == 1 ? 'Deshabilitar usuario' : 'Habilitar usuario'}">
-                        <i class="fas fa-user-${estadoValue == 1 ? 'check' : 'slash'}"></i>
-                    </button>
-                </div>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
 
