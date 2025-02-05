@@ -253,7 +253,7 @@
 <div id="dehabilitarConfirmModal" class="modal">
     <div class="usuarios-modal-content">
         <div class="modal-header">
-            <h2>Deshabilitar Usuario</h2>
+            <h2 id="modal-header-title">Deshabilitar Usuario</h2>
             <span class="close" onclick="closeDeshabilitarModal()">&times;</span>
         </div>
         <div class="modal-body disable-confirmation">
@@ -261,8 +261,8 @@
                 <i class="fas fa-exclamation-triangle"></i>
             </div>
             <div class="disable-message" id="disable-content">
-                <h3>¿Estás seguro de deshabilitar este usuario?</h3>
-                <p>El usuario perderá temporalmente el acceso al sistema. Podrás habilitarlo nuevamente más tarde.</p>
+                <h3 id="disable-title">>¿Estás seguro de deshabilitar este usuario?</h3>
+                <p id="disable-text">El usuario perderá temporalmente el acceso al sistema. Podrás habilitarlo nuevamente más tarde.</p>
             </div>
         </div>
         <div class="modal-footer">

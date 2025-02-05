@@ -64,21 +64,29 @@ function closeDeshabilitarModal() {
 function mostrarConfirmacionDeshabilitar(id) {
     usuarioIdADeshabilitar = id;
     
-    // Obtén el estado actual del usuario correctamente
+    // Obtener el botón y su estado
     const botonEstado = document.querySelector(`.action-btn.toggle-btn[onclick="mostrarConfirmacionDeshabilitar(${id})"]`);
     const estadoActual = botonEstado.classList.contains('enabled');
     
-    const tituloModal = document.getElementById('disable-content');
+    // Obtener elementos del modal
+    const tituloHeader = document.getElementById('modal-header-title');
+    const tituloModal = document.getElementById('disable-title');
+    const textoModal = document.getElementById('disable-text');
     const botonModal = document.getElementById('disable-button');
     
     if (estadoActual) {
-        // Usuario habilitado, preparar para deshabilitar
-        tituloModal.innerHTML = '<h3>¿Estás seguro de deshabilitar este usuario?</h3>';
+        // Usuario habilitado - preparar para deshabilitar
+        tituloModal.textContent = '¿Estás seguro de deshabilitar este usuario?';
+        textoModal.textContent = 'El usuario perderá temporalmente el acceso al sistema. Podrás habilitarlo nuevamente más tarde.';
         botonModal.innerHTML = '<i class="fas fa-user-slash"></i> Deshabilitar';
+        botonModal.style.backgroundColor = '#e2ac09'; // Color amarillo para deshabilitar
     } else {
-        // Usuario deshabilitado, preparar para habilitar
-        tituloModal.innerHTML = '<h3>¿Estás seguro de habilitar este usuario?</h3>';
+        // Usuario deshabilitado - preparar para habilitar
+        tituloHeader.textContent = 'Habilitar Usuario';
+        tituloModal.textContent = '¿Estás seguro de habilitar este usuario?';
+        textoModal.textContent = 'El usuario recuperará el acceso al sistema.';
         botonModal.innerHTML = '<i class="fas fa-user-check"></i> Habilitar';
+        botonModal.style.backgroundColor = '#28a745'; // Color verde para habilitar
     }
     
     document.getElementById("dehabilitarConfirmModal").style.display = "block";
