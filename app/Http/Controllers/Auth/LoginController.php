@@ -51,6 +51,8 @@ class LoginController extends Controller
         return back()->withErrors([
             'rut' => 'Las credenciales proporcionadas no coinciden con nuestros registros.'
         ]);
+
+
     }
 
     public function logout(Request $request)

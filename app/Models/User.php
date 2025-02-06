@@ -12,35 +12,6 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
 
-    // Constantes para roles
-    // const ROL_ADMINISTRADOR = 1;
-    // const ROL_VECINO = 2;
-
-    // // Constantes para estado
-    // const ESTADO_ACTIVO = 1;
-    // const ESTADO_INACTIVO = 0;
-
-    // // Accessor para rol
-    // public function getRolNombreAttribute()
-    // {
-    //     return match($this->rol) {
-    //         self::ROL_ADMINISTRADOR => 'Administrador',
-    //         self::ROL_VECINO => 'Vecino',
-    //         default => 'No definido'
-    //     };
-    // }
-
-    // // Accessor para estado
-    // public function getEstadoNombreAttribute()
-    // {
-    //     return match($this->estado) {
-    //         true => 'Habilitado',
-    //         false => 'Inhabilitado',
-    //         default => 'No definido'
-    //     };
-    // }
-
-
     use HasApiTokens, HasFactory, Notifiable;
 
     /**

@@ -29,7 +29,8 @@ Route::middleware(['auth', 'check.status'])->group(function () {
 
     // rutas de concatcos y canchas
     Route::get('contacto', [ContactoController::class, 'index'])->name('contacto.index');
-    Route::get('canchas', [CanchasController::class, 'index'])->name('canchas.index');
+    Route::get('/canchas', [CanchasController::class, 'index'])->name('canchas.index');
+    Route::post('/reservas', [CanchasController::class, 'store'])->name('reservas.store');
 
     // funciones de usuarios
     Route::get('/getUsuarios', [UsuariosController::class, 'getUsuarios']);
@@ -42,4 +43,5 @@ Route::middleware(['auth', 'check.status'])->group(function () {
     Route::post('deshabilitarUsuario/{id}', [UsuariosController::class, 'deshabilitarUsuario']);
     Route::post('/filtrarUsuarios', [UsuariosController::class, 'filtrarUsuarios']);
     Route::get('/filtrarUsuarios', [UsuariosController::class, 'index']);
+    
 });
