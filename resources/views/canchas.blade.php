@@ -20,7 +20,7 @@
                    class="btn btn-outline-primary">
                     <i class="fas fa-chevron-left"></i> Mes anterior
                 </a>
-                <h3 class="mb-0">{{ $fecha->translatedFormat('F Y') }}</h3>
+                <h3 class="mb-0">{{ mb_strtoupper($fecha->translatedFormat('F'), 'UTF-8') }}</h3>
                 <a href="{{ route('canchas.index', ['fecha' => $mesSiguiente]) }}" 
                    class="btn btn-outline-primary">
                     Mes siguiente <i class="fas fa-chevron-right"></i>
@@ -28,30 +28,51 @@
             </div>
             <div class="calendar">
                 <div class="row text-center fw-bold border-bottom py-2 bg-light">
-                    <div class="col">Dom</div>
+
                     <div class="col">Lun</div>
                     <div class="col">Mar</div>
                     <div class="col">Mié</div>
                     <div class="col">Jue</div>
                     <div class="col">Vie</div>
                     <div class="col">Sáb</div>
+                    <div class="col">Dom</div>
+
                 </div>
             
                 <div class="row">
-                    @php $counter = 0; @endphp
+                    @php 
+                        $counter = 0; 
+                        $today = now()->format('Y-m-d');
+                        $startOfWeek = now()->startOfWeek()->format('Y-m-d');
+                        $endOfWeek = now()->endOfWeek()->format('Y-m-d');
+                    @endphp
                     @foreach($calendario as $dia)
                         @if($counter % 7 == 0)
                             </div><div class="row">
                         @endif
-                        <div class="col p-2 border position-relative" style="height: 100px;">
+                        <div class="col p-2 border position-relative {{ $dia && $dia->format('Y-m-d') == $today ? 'dia-actual' : '' }}" style="height: 100px;">
                             @if($dia)
                                 <span class="position-absolute top-0 start-0 p-1">{{ $dia->day }}</span>
-                                <button class="btn btn-sm btn-outline-success position-absolute bottom-0 start-50 translate-middle-x mb-1"
+                                
+                                @php
+                                    $isDiaHabilitado = $dia && 
+                                        $dia->format('Y-m-d') >= $startOfWeek && 
+                                        $dia->format('Y-m-d') <= $endOfWeek;
+                                @endphp
+                                
+                                @if($isDiaHabilitado)
+                                    <button class="btn btn-sm {{ $isDiaHabilitado ? 'btn-reserva-habilitado' : 'btn-outline-secondary' }} position-absolute bottom-0 start-50 translate-middle-x mb-1"
                                         data-bs-toggle="modal" 
                                         data-bs-target="#reservationModal"
                                         data-fecha="{{ $dia->format('Y-m-d') }}">
-                                    Reservar
-                                </button>
+                                        Reservar
+                                    </button>
+                                @else
+                                    <button class="btn btn-sm btn-outline-secondary position-absolute bottom-0 start-50 translate-middle-x mb-1"
+                                        disabled>
+                                        Reservar
+                                    </button>
+                                @endif
                             @endif
                         </div>
                         @php $counter++; @endphp
@@ -61,45 +82,108 @@
         </div>
     </div>
 
-    <div class="modal fade" id="reservationModal" tabindex="-1">
+
+
+    <!-- Modal Reserva-->
+    <div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header bg-custom-blue text-white">
-                    <h5 class="modal-title">Hacer Reservación</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reservationModalLabel">Generar Reserva</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <form id="reservationForm" method="POST" action="{{ route('reservas.store') }}">
-                        @csrf
-                        <input type="hidden" name="fecha" id="fecha_reserva">
+                <form id="reservaForm" onsubmit="crearReserva(event)">
+                    <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label">Horario Disponible</label>
-                            <select class="form-select" name="horario" required>
-                                @foreach(range(8, 20) as $hora)
-                                    <option value="{{ sprintf('%02d:00', $hora) }}">
-                                        {{ sprintf('%02d:00', $hora) }} - {{ sprintf('%02d:00', $hora + 1) }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            <label for="fecha_reserva" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="fecha_reserva" name="fecha_reserva" readonly disabled>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Cancha</label>
-                            <select class="form-select" name="cancha_id" required>
-                                <option value="1">Cancha 1</option>
-                                <option value="2">Cancha 2</option>
-                                <option value="3">Cancha 3</option>
+                            <label for="horario" class="form-label">Horario</label>
+                            <select class="form-select" id="horario" name="horario" required>
+                                <option value="8">08:00 - 09:00</option>
+                                <option value="9">09:00 - 10:00</option>
+                                <option value="10">10:00 - 11:00</option>
+                                <option value="11">11:00 - 12:00</option>
+                                <option value="12">12:00 - 13:00</option>
+                                <option value="13">13:00 - 14:00</option>
+                                <option value="14">14:00 - 15:00</option>
+                                <option value="15">15:00 - 16:00</option>
+                                <option value="16">16:00 - 17:00</option>
+                                <option value="17">17:00 - 18:00</option>
+                                <option value="18">18:00 - 19:00</option>
+                                <option value="19">19:00 - 20:00</option>
+                                <option value="20">20:00 - 21:00</option>
                             </select>
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" form="reservationForm" class="btn btn-custom-blue">Confirmar Reserva</button>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn text-white bg-custom-blue">Reservar</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    // Abrir y cerrar el modal AGREGAR
+    function openModalAgregar() {
+        document.getElementById("ReservaModal").style.display = "block";
+    }
+    function closeModalAgregar() {
+        document.getElementById("ReservaModal").style.display = "none";
+        document.getElementById("reservaForm").reset();
+    }
+
+    // Agregar este script después de tu script existente
+    document.addEventListener('DOMContentLoaded', function() {
+        // Obtener el modal
+        const reservationModal = document.getElementById('reservationModal');
+        
+        // Agregar evento para cuando el modal se muestre
+        reservationModal.addEventListener('show.bs.modal', function(event) {
+            // Obtener el botón que activó el modal
+            const button = event.relatedTarget;
+            
+            // Obtener la fecha del atributo data-fecha del botón
+            const fecha = button.getAttribute('data-fecha');
+            
+            // Obtener el input de fecha dentro del modal
+            const fechaInput = document.getElementById('fecha_reserva');
+            
+            // Establecer el valor del input con la fecha seleccionada
+            fechaInput.value = fecha;
+        });
+    });
+
+    async function crearReserva(event) {
+        event.preventDefault();
+        
+        const fecha = document.getElementById('fecha_reserva').value;
+        const horario = document.getElementById('horario').value;
+        
+        const datos = {
+            fecha_reserva: fecha,
+            horario: horario,
+            user_id: {{ Auth::id() }}, // Usar la función de Laravel para obtener el ID del usuario autenticado
+            id_cancha: 1 // Cambiar por el ID de la cancha seleccionada
+        };
+        
+        console.log("Datos a enviar:", datos);
+        
+        try {
+            const response = await axios.post('crearReserva', datos);
+            $('#reservationModal').modal('hide');
+            alert(response.data.message);
+        } catch (error) {
+            console.error("Error al crear reserva:", error);
+            alert(error.response?.data?.message || "Error al crear la reserva");
+        }
+    }
+</script>
 
 <style>
     :root {
@@ -149,17 +233,30 @@
         color: white !important;
     }
 
-</style>
+    
+    .dia-actual {
+        background-color: rgba(40, 167, 69, 0.1); /* Verde muy suave */
+        border: 1px solid rgba(40, 167, 69, 0.3); /* Borde verde suave */
+    }
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const modal = document.getElementById('reservationModal');
-        modal.addEventListener('show.bs.modal', function(event) {
-            const button = event.relatedTarget;
-            const fecha = button.getAttribute('data-fecha');
-            document.getElementById('fecha_reserva').value = fecha;
-        });
-    });
-</script>
+    .dia-actual span {
+        font-weight: bold;
+        color: #28a745; /* Verde más intenso */
+    }
+
+    .btn-reserva-habilitado {
+        color: white !important;
+        background-color: #28a745 !important; /* Verde */
+        border-color: #28a745 !important;
+    }
+
+    .btn-reserva-habilitado:hover {
+        background-color: #218838 !important; /* Verde más oscuro */
+        border-color: #1e7e34 !important;
+    }
+
+
+            
+</style>
 
 @endsection

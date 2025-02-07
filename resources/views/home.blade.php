@@ -57,37 +57,4 @@
         </div>
     </div>
 
-    <!-- Latest News Section -->
-    <div class="container my-5">
-        <h2 class="text-center mb-4">Últimas Novedades</h2>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <img src="/api/placeholder/400/200" class="card-img-top" alt="Noticia 1">
-                    <div class="card-body">
-                        <h5 class="card-title">Nuevo Sistema de Reservas</h5>
-                        <p class="card-text">Implementamos un nuevo sistema para hacer tu experiencia más fácil y rápida.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <img src="{{ asset('imagenes/images.jpg') }}" class="card-img-top" alt="Noticia 2">
-                    <div class="card-body">
-                        <h5 class="card-title">Mantenimiento de Canchas</h5>
-                        <p class="card-text">Realizamos mantenimiento periódico para garantizar la mejor calidad de juego.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <img src="{{ asset('imagenes/persona.jpg') }}" class="card-img-top" alt="Noticia 3">
-                    <div class="card-body">
-                        <h5 class="card-title">Horarios Extendidos</h5>
-                        <p class="card-text">Ampliamos nuestros horarios para mayor comodidad de nuestros usuarios.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection

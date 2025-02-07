@@ -145,8 +145,6 @@ class UsuariosController extends Controller
         return response()->json($usuario, 200);
     }
 
-
-
     //   Eliminar usuario
     public function destroy($id)
     {
@@ -166,7 +164,6 @@ class UsuariosController extends Controller
             'success' => true
         ]);
     }
-    //   Eliminar usuario
     public function deshabilitarUsuario(Request $request, $id)
     {
         $usuario = User::find($id);

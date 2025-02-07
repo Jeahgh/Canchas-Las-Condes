@@ -50,8 +50,8 @@
         </a>
 
         <nav class="menu-links">
-            <a href="{{ route('home') }}"><i class="fas fa-home"></i> Inicio</a>
             <a href="{{ route('canchas.index') }}"><i class="fas fa-calendar-check"></i> Reserva de canchas</a>
+            <a href="{{ route('home') }}"><i class="fas fa-home"></i> Sobre Nosotros</a>
             <a href="{{ route('contacto.index') }}"><i class="fas fa-envelope"></i> Contáctanos</a>
             <a href="{{ route('usuarios.index') }}"><i class="fas fa-users"></i> Usuarios</a>
         </nav>

@@ -27,10 +27,12 @@ Route::post('/logout', [LoginController::class, 'logout'])
 Route::middleware(['auth', 'check.status'])->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('home'); 
 
-    // rutas de concatcos y canchas
+    // rutas de concatcos
     Route::get('contacto', [ContactoController::class, 'index'])->name('contacto.index');
+   
+   //funciomes de canchas
     Route::get('/canchas', [CanchasController::class, 'index'])->name('canchas.index');
-    Route::post('/reservas', [CanchasController::class, 'store'])->name('reservas.store');
+    Route::post('crearReserva', [CanchasController::class, 'create'])->name('reservas.create');
 
     // funciones de usuarios
     Route::get('/getUsuarios', [UsuariosController::class, 'getUsuarios']);

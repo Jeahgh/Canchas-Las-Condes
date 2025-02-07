@@ -45,7 +45,7 @@ class LoginController extends Controller
                 ]);
             }
     
-            return redirect()->intended('/');
+            return redirect()->intended('/canchas');
         }
     
         return back()->withErrors([
