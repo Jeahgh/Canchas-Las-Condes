@@ -56,6 +56,7 @@
                                 
                                 @php
                                     $isDiaHabilitado = $dia && 
+                                        $dia->format('Y-m-d') >= $today &&
                                         $dia->format('Y-m-d') >= $startOfWeek && 
                                         $dia->format('Y-m-d') <= $endOfWeek;
                                 @endphp
