@@ -16,7 +16,8 @@ class CreateDisponibilidadCanchasTable extends Migration
         Schema::create('disponibilidad_canchas', function (Blueprint $table) {
             $table->id();
             $table->date('fecha');
-            $table->integer('hora'); // referencia a la hora inicial de la reserva
+            $table->integer('id_hora'); // referencia a la hora inicial de la reserva
+            $table->string('hora'); // hora que se muestra en la vista
             $table->boolean('cancha_1')->default(true);
             $table->boolean('cancha_2')->default(true);
             $table->boolean('cancha_3')->default(true);

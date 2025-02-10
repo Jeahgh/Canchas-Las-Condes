@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reserva;
+use App\Models\DisponibilidadCanchas;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CanchasController extends Controller
 {
@@ -57,64 +59,78 @@ class CanchasController extends Controller
     public function create(Request $request)
     {
         try {
-            // $validatedData = $request->validate([
-            //     'fecha_reserva' => 'required|date|after_or_equal:today',
-            //     'horario' => 'required|in:08:00,09:00,10:00,11:00,12:00,13:00,14:00,15:00,16:00,17:00,18:00,19:00,20:00'
-            // ]);
+            // Obtener fecha y código de hora
+            $fechaReserva = $request->input('fecha_reserva');
+            $idHora = $request->input('horario');
     
-            // Lógica de creación de reserva 
+            // Buscar cancha disponible
+            $idCancha = $this->buscarCanchaDisponible($fechaReserva, $idHora);
+    
+            if (!$idCancha) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No hay canchas disponibles'
+                ], 400);
+            }
+    
+            // Obtener detalles del horario
+            $horarioDetalle = DisponibilidadCanchas::where('fecha', $fechaReserva)
+                ->where('id_hora', $idHora)
+                ->first();
+    
+            // Crear reserva
             $reserva = Reserva::create([
-                'usuario_id' => auth()->id(),
-                'cancha_id' => 1, // Esto debería venir del formulario
-                'fecha_reserva' => 'fecha_reserva',
-                'horario' => 'horario',
-                // 'fecha_reserva' => $validatedData['fecha_reserva'],
-                // 'horario' => $validatedData['horario'],
-                'estado' => 'activo'
+                'id_usuario' => auth()->id(),
+                'id_cancha' => $idCancha,
+                'fecha_reserva' => $fechaReserva,
+                'estado' => 1, // Estado activo
+                'codigo_disponibilidad' => $idHora
             ]);
     
             return response()->json([
                 'success' => true,
-                'message' => 'Reserva creada exitosamente',
-                'reserva' => $reserva
+                'message' => 'Reserva creada exitosamente'
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al crear la reserva:' . $e->getMessage()
+                'message' => 'Error: ' . $e->getMessage()
             ], 400);
         }
     }
 
-    public function getHorasDisponibles($fecha)
+    public function getHorasDisponibles(Request $request)
     {
-        // Obtener todas las reservas para ese día
+        $fecha = $request->input('fecha');
+    
         $reservasExistentes = Reserva::where('fecha_reserva', $fecha)
-            ->select('horario', 'cancha_id')
+            ->select('hora', 'id_cancha')
             ->get();
-
-        // Obtener la disponibilidad especial para ese día
-        $disponibilidadEspecial = DisponibilidadCancha::where('fecha', $fecha)
+    
+        $disponibilidadEspecial = DisponibilidadCanchas::where('fecha', $fecha)
             ->get()
-            ->keyBy('hora');
-
+            ->keyBy('id_hora');
+    
         $horasDisponibles = [];
         
-        // Revisar cada hora del día
-        foreach (DisponibilidadCancha::HORARIOS as $hora => $rangoHora) {
+        // Fetch horarios from database instead of hardcoded array
+        $horariosDisponibles = DisponibilidadCanchas::where('fecha', $fecha)
+            ->select('id_hora', 'hora')
+            ->distinct()
+            ->get();
+    
+        foreach ($horariosDisponibles as $horario) {
             $algunaCanchaDisponible = false;
             
-            // Verificar cada cancha
             for ($cancha = 1; $cancha <= 3; $cancha++) {
-                // Verificar si ya está reservada
                 $reservada = $reservasExistentes
-                    ->where('horario', $hora)
-                    ->where('cancha_id', $cancha)
+                    ->where('hora', $horario->id_hora)
+                    ->where('id_cancha', $cancha)
                     ->isNotEmpty();
                 
-                // Verificar disponibilidad especial
-                $disponible = !isset($disponibilidadEspecial[$hora]) || 
-                            $disponibilidadEspecial[$hora]["cancha_$cancha"];
+                $disponible = isset($disponibilidadEspecial[$horario->id_hora]) 
+                    ? $disponibilidadEspecial[$horario->id_hora]["cancha_$cancha"] 
+                    : true;
                 
                 if (!$reservada && $disponible) {
                     $algunaCanchaDisponible = true;
@@ -124,40 +140,42 @@ class CanchasController extends Controller
             
             if ($algunaCanchaDisponible) {
                 $horasDisponibles[] = [
-                    'hora' => $hora,
-                    'rango' => $rangoHora
+                    'hora' => $horario->id_hora,
+                    'rango' => $horario->hora
                 ];
             }
         }
-
-        return $horasDisponibles;
+    
+        return response()->json($horasDisponibles);
     }
 
-    private function buscarCanchaDisponible($fecha, $hora)
-    {
+    private function buscarCanchaDisponible($fecha, $hora){
+        // Buscar reservas existentes para esta fecha y hora
         $reservasExistentes = Reserva::where('fecha_reserva', $fecha)
-            ->where('horario', $hora)
-            ->pluck('cancha_id');
-
-        $disponibilidadEspecial = DisponibilidadCancha::where('fecha', $fecha)
+            ->where('hora', $hora)
+            ->pluck('id_cancha');
+    
+        // Verificar disponibilidad especial
+        $disponibilidadEspecial = DisponibilidadCanchas::where('fecha', $fecha)
             ->where('hora', $hora)
             ->first();
-
+    
         // Buscar la primera cancha disponible
         for ($cancha = 1; $cancha <= 3; $cancha++) {
             // Verificar si ya está reservada
             if ($reservasExistentes->contains($cancha)) {
                 continue;
             }
-
+    
             // Verificar disponibilidad especial
             if ($disponibilidadEspecial && !$disponibilidadEspecial["cancha_$cancha"]) {
                 continue;
             }
-
+    
             return $cancha;
         }
-
+    
         return null;
     }
+
 }

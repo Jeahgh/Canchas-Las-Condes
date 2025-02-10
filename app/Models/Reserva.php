@@ -12,7 +12,6 @@ class Reserva extends Model
         'id_usuario',
         'id_cancha',
         'fecha_reserva',
-        'hora',
         'estado'
     ];
 

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class DisponibilidadCancha extends Model
+class DisponibilidadCanchas extends Model
 {
     protected $table = 'disponibilidad_canchas';
 
@@ -15,4 +15,5 @@ class DisponibilidadCancha extends Model
         'cancha_2', 
         'cancha_3'
     ];
+
 }

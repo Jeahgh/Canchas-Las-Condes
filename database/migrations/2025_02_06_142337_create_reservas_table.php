@@ -18,7 +18,6 @@ class CreateReservasTable extends Migration
             $table->integer('id_usuario'); // id del usuario que solicita la reserva
             $table->integer('id_cancha'); // id de la cancha que se reserva
             $table->date('fecha_reserva'); // fecha de la reserva
-            $table->time('hora'); // hora de la reserva
             $table->integer('estado'); // estado de la reserva
             $table->timestamps();
         });

@@ -83,8 +83,6 @@
         </div>
     </div>
 
-
-
     <!-- Modal Reserva-->
     <div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -94,6 +92,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form id="reservaForm" onsubmit="crearReserva(event)">
+                    @csrf
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="fecha_reserva" class="form-label">Fecha</label>
@@ -102,19 +101,6 @@
                         <div class="mb-3">
                             <label for="horario" class="form-label">Horario</label>
                             <select class="form-select" id="horario" name="horario" required>
-                                <option value="8">08:00 - 09:00</option>
-                                <option value="9">09:00 - 10:00</option>
-                                <option value="10">10:00 - 11:00</option>
-                                <option value="11">11:00 - 12:00</option>
-                                <option value="12">12:00 - 13:00</option>
-                                <option value="13">13:00 - 14:00</option>
-                                <option value="14">14:00 - 15:00</option>
-                                <option value="15">15:00 - 16:00</option>
-                                <option value="16">16:00 - 17:00</option>
-                                <option value="17">17:00 - 18:00</option>
-                                <option value="18">18:00 - 19:00</option>
-                                <option value="19">19:00 - 20:00</option>
-                                <option value="20">20:00 - 21:00</option>
                             </select>
                         </div>
                     </div>
@@ -139,6 +125,74 @@
         document.getElementById("reservaForm").reset();
     }
 
+
+
+    async function crearReserva(event) {
+        event.preventDefault();
+        
+        const fecha = document.getElementById('fecha_reserva').value;
+        const horario = document.getElementById('horario').value;
+        
+        try {
+            const response = await axios.post('{{ route("reservas.create") }}', {
+                fecha_reserva: fecha,
+                horario: horario
+            });
+            
+            $('#reservationModal').modal('hide');
+            alert(response.data.message);
+            location.reload(); // Actualizar página
+        } catch (error) {
+            alert(error.response?.data?.message || "Error al crear reserva");
+        }
+    }
+
+
+    // Script para cargar horas disponibles dinámicamente
+    document.addEventListener('DOMContentLoaded', function() {
+        const reservationModal = document.getElementById('reservationModal');
+        const horaSelect = document.getElementById('horario');
+        
+        reservationModal.addEventListener('show.bs.modal', function(event) {
+            // Obtener la fecha seleccionada
+            const button = event.relatedTarget;
+            const fecha = button.getAttribute('data-fecha');
+            document.getElementById('fecha_reserva').value = fecha;
+            
+            // Limpiar opciones anteriores
+            horaSelect.innerHTML = '';
+            
+            // Llamar al endpoint para obtener horas disponibles
+            axios.get(`/horas-disponibles?fecha=${fecha}`)
+                .then(response => {
+                    const horasDisponibles = response.data;
+                    
+                    // Generar opciones solo para horas disponibles
+                    horasDisponibles.forEach(hora => {
+                        const option = document.createElement('option');
+                        option.value = hora.hora;  // Valor numérico de la hora
+                        option.textContent = hora.rango;  // Texto descriptivo
+                        horaSelect.appendChild(option);
+                    });
+                    
+                    // Si no hay horas disponibles
+                    if (horasDisponibles.length === 0) {
+                        const option = document.createElement('option');
+                        option.textContent = 'No hay horas disponibles';
+                        option.disabled = true;
+                        horaSelect.appendChild(option);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al cargar horas disponibles:', error);
+                    const option = document.createElement('option');
+                    option.textContent = 'Error al cargar horas';
+                    option.disabled = true;
+                    horaSelect.appendChild(option);
+                });
+        });
+    });
+
     // Agregar este script después de tu script existente
     document.addEventListener('DOMContentLoaded', function() {
         // Obtener el modal
@@ -160,30 +214,6 @@
         });
     });
 
-    async function crearReserva(event) {
-        event.preventDefault();
-        
-        const fecha = document.getElementById('fecha_reserva').value;
-        const horario = document.getElementById('horario').value;
-        
-        const datos = {
-            fecha_reserva: fecha,
-            horario: horario,
-            user_id: {{ Auth::id() }}, // Usar la función de Laravel para obtener el ID del usuario autenticado
-            id_cancha: 1 // Cambiar por el ID de la cancha seleccionada
-        };
-        
-        console.log("Datos a enviar:", datos);
-        
-        try {
-            const response = await axios.post('crearReserva', datos);
-            $('#reservationModal').modal('hide');
-            alert(response.data.message);
-        } catch (error) {
-            console.error("Error al crear reserva:", error);
-            alert(error.response?.data?.message || "Error al crear la reserva");
-        }
-    }
 </script>
 
 <style>
