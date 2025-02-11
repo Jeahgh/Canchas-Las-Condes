@@ -34,6 +34,7 @@ Route::middleware(['auth', 'check.status'])->group(function () {
     Route::get('/canchas', [CanchasController::class, 'index'])->name('canchas.index');
     Route::post('crearReserva', [CanchasController::class, 'create'])->name('reservas.create');
     Route::get('horas-disponibles', [CanchasController::class, 'getHorasDisponibles'])->name('horas-disponibles');
+    Route::get('/comprobante-reserva', [CanchasController::class, 'generarComprobante']);
 
     // funciones de usuarios
     Route::get('/getUsuarios', [UsuariosController::class, 'getUsuarios']);

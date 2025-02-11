@@ -9,7 +9,8 @@ class DisponibilidadCanchas extends Model
     protected $table = 'disponibilidad_canchas';
 
     protected $fillable = [
-        'fecha', 
+        'fecha',
+        'id_hora', 
         'hora', 
         'cancha_1', 
         'cancha_2', 

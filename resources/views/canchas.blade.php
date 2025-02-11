@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
 <div class="container-calendar">
     <h1 class="text-center mb-4 text-custom-blue fw-bold">Reserva de Canchas</h1>
 
@@ -91,12 +92,12 @@
                     <h5 class="modal-title" id="reservationModalLabel">Generar Reserva</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="reservaForm" onsubmit="crearReserva(event)">
+                <form id="reservaForm" onsubmit="crearReserva(event)" method="POST">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="fecha_reserva" class="form-label">Fecha</label>
-                            <input type="date" class="form-control" id="fecha_reserva" name="fecha_reserva" readonly disabled>
+                            <input type="date" class="form-control" id="fecha_reserva" name="fecha_reserva" readonly>
                         </div>
                         <div class="mb-3">
                             <label for="horario" class="form-label">Horario</label>
@@ -113,6 +114,91 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Confirmación de Reserva -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <!-- Encabezado con degradado y check animado -->
+            <div class="position-relative">
+                <div class="modal-header border-0 bg-gradient-success text-white py-4" 
+                     style="background:#181f47">
+                    <div class="position-absolute top-0 start-50 translate-middle-x" style="margin-top: -30px;">
+                        <div class="bg-white rounded-circle p-3 shadow-lg d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                            <i class="fas fa-check text-success" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center pt-4 pb-2">
+                    <h4 class="fw-bold text-success mb-0">¡Reserva Confirmada!</h4>
+                    <p class="text-muted">Tu cancha está lista para ti</p>
+                </div>
+            </div>
+
+            <div class="modal-body px-4 py-4">
+                <!-- Alerta estilizada -->
+                <div class="alert border-start border-4 border-warning bg-warning bg-opacity-10 d-flex align-items-center mb-4">
+                    <div class="me-3">
+                        <i class="fas fa-id-card text-warning fa-2x"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold text-warning mb-1">¡Importante!</h6>
+                        <p class="mb-0">Recuerda traer tu carnet de identidad el día de la reserva.</p>
+                    </div>
+                </div>
+
+                <!-- Detalles de la reserva -->
+                <div class="bg-light rounded-3 p-4">
+                    <h6 class="fw-bold text-custom-blue mb-3">
+                        <i class="fas fa-calendar-check me-2"></i>
+                        Detalles de tu reserva
+                    </h6>
+                    
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <small class="text-muted d-block">Fecha</small>
+                                    <strong id="conf-fecha"></strong>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <small class="text-muted d-block">Hora</small>
+                                    <strong id="conf-hora"></strong>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <small class="text-muted d-block">Número de Cancha</small>
+                                    <strong id="conf-cancha"></strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 justify-content-center gap-2 py-4">
+                <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>
+                    Cerrar
+                </button>
+                <button type="button" class="btn bg-custom-blue text-white px-4" onclick="descargarComprobante()">
+                    <i class="fas fa-download me-2"></i>
+                    Descargar Comprobante
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
@@ -131,20 +217,44 @@
         event.preventDefault();
         
         const fecha = document.getElementById('fecha_reserva').value;
-        const horario = document.getElementById('horario').value;
+        const idDisponibilidad = document.getElementById('horario').value;
         
         try {
-            const response = await axios.post('{{ route("reservas.create") }}', {
+            const response = await axios.post('/crearReserva', {
                 fecha_reserva: fecha,
-                horario: horario
+                horario: idDisponibilidad,
+                _token: '{{ csrf_token() }}'
             });
             
-            $('#reservationModal').modal('hide');
-            alert(response.data.message);
-            location.reload(); // Actualizar página
+            if (response.data.success) {
+                // Cerrar el modal de reserva
+                const reservaModal = bootstrap.Modal.getInstance(document.getElementById('reservationModal'));
+                reservaModal.hide();
+                
+                // Actualizar los detalles en el modal de confirmación
+                document.getElementById('conf-fecha').textContent = new Date(fecha).toLocaleDateString('es-ES');
+                document.getElementById('conf-hora').textContent = document.getElementById('horario').options[document.getElementById('horario').selectedIndex].text;
+                document.getElementById('conf-cancha').textContent = response.data.cancha;
+                
+                // Mostrar el modal de confirmación
+                const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                confirmationModal.show();
+            } else {
+                alert(response.data.message || "Error al crear la reserva");
+            }
         } catch (error) {
-            alert(error.response?.data?.message || "Error al crear reserva");
+            console.error('Error:', error);
+            alert(error.response?.data?.message || "Error al crear la reserva");
         }
+    }
+
+    function descargarComprobante() {
+        const fecha = document.getElementById('conf-fecha').textContent;
+        const hora = document.getElementById('conf-hora').textContent;
+        const cancha = document.getElementById('conf-cancha').textContent;
+        
+        // Abrir en una nueva ventana
+        window.open(`/comprobante-reserva?fecha=${fecha}&hora=${hora}&cancha=${cancha}`, '_blank');
     }
 
 
@@ -284,6 +394,33 @@
     .btn-reserva-habilitado:hover {
         background-color: #218838 !important; /* Verde más oscuro */
         border-color: #1e7e34 !important;
+    }
+
+    .bg-gradient-success {
+        background: linear-gradient(45deg, #28a745 0%, #20c997 100%);
+    }
+    
+    /* Animación para el check */
+    @keyframes checkmark {
+        0% { transform: scale(0); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+    
+    .modal.fade .modal-dialog {
+        transition: transform .3s ease-out;
+        transform: scale(0.95);
+    }
+    
+    .modal.show .modal-dialog {
+        transform: scale(1);
+    }
+    
+    /* Estilo hover para el botón de descarga */
+    .btn.bg-custom-blue:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(24, 31, 71, 0.15);
+        transition: all 0.3s ease;
     }
 
 

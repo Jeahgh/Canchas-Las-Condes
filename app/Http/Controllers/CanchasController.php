@@ -59,11 +59,11 @@ class CanchasController extends Controller
     public function create(Request $request)
     {
         try {
-            // Obtener fecha y código de hora
+            DB::beginTransaction();
+    
             $fechaReserva = $request->input('fecha_reserva');
             $idHora = $request->input('horario');
     
-            // Buscar cancha disponible
             $idCancha = $this->buscarCanchaDisponible($fechaReserva, $idHora);
     
             if (!$idCancha) {
@@ -73,25 +73,28 @@ class CanchasController extends Controller
                 ], 400);
             }
     
-            // Obtener detalles del horario
-            $horarioDetalle = DisponibilidadCanchas::where('fecha', $fechaReserva)
-                ->where('id_hora', $idHora)
-                ->first();
-    
-            // Crear reserva
             $reserva = Reserva::create([
                 'id_usuario' => auth()->id(),
                 'id_cancha' => $idCancha,
                 'fecha_reserva' => $fechaReserva,
-                'estado' => 1, // Estado activo
+                'estado' => 1,
                 'codigo_disponibilidad' => $idHora
             ]);
     
+            $disponibilidad = DisponibilidadCanchas::find($idHora);
+            $columna = "cancha_" . $idCancha;
+            $disponibilidad->$columna = 0;
+            $disponibilidad->save();
+    
+            DB::commit();
+    
             return response()->json([
                 'success' => true,
-                'message' => 'Reserva creada exitosamente'
+                'message' => 'Reserva creada exitosamente',
+                'cancha' => $idCancha
             ]);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Error: ' . $e->getMessage()
@@ -103,72 +106,45 @@ class CanchasController extends Controller
     {
         $fecha = $request->input('fecha');
     
-        $reservasExistentes = Reserva::where('fecha_reserva', $fecha)
-            ->select('hora', 'id_cancha')
-            ->get();
-    
-        $disponibilidadEspecial = DisponibilidadCanchas::where('fecha', $fecha)
+        $horasDisponibles = DisponibilidadCanchas::where('fecha', $fecha)
+            ->where(function($query) {
+                $query->where('cancha_1', 1)
+                      ->orWhere('cancha_2', 1)
+                      ->orWhere('cancha_3', 1);
+            })
+            ->select('id', 'hora')
             ->get()
-            ->keyBy('id_hora');
-    
-        $horasDisponibles = [];
-        
-        // Fetch horarios from database instead of hardcoded array
-        $horariosDisponibles = DisponibilidadCanchas::where('fecha', $fecha)
-            ->select('id_hora', 'hora')
-            ->distinct()
-            ->get();
-    
-        foreach ($horariosDisponibles as $horario) {
-            $algunaCanchaDisponible = false;
-            
-            for ($cancha = 1; $cancha <= 3; $cancha++) {
-                $reservada = $reservasExistentes
-                    ->where('hora', $horario->id_hora)
-                    ->where('id_cancha', $cancha)
-                    ->isNotEmpty();
-                
-                $disponible = isset($disponibilidadEspecial[$horario->id_hora]) 
-                    ? $disponibilidadEspecial[$horario->id_hora]["cancha_$cancha"] 
-                    : true;
-                
-                if (!$reservada && $disponible) {
-                    $algunaCanchaDisponible = true;
-                    break;
-                }
-            }
-            
-            if ($algunaCanchaDisponible) {
-                $horasDisponibles[] = [
-                    'hora' => $horario->id_hora,
-                    'rango' => $horario->hora
+            ->map(function ($disponibilidad) {
+                return [
+                    'hora' => $disponibilidad->id,
+                    'rango' => $disponibilidad->hora
                 ];
-            }
-        }
+            });
     
         return response()->json($horasDisponibles);
     }
 
-    private function buscarCanchaDisponible($fecha, $hora){
-        // Buscar reservas existentes para esta fecha y hora
-        $reservasExistentes = Reserva::where('fecha_reserva', $fecha)
-            ->where('hora', $hora)
+    private function buscarCanchaDisponible($fecha, $idDisponibilidad)
+    {
+        // Obtener el registro de disponibilidad
+        $disponibilidad = DisponibilidadCanchas::find($idDisponibilidad);
+        if (!$disponibilidad) {
+            return null;
+        }
+    
+        // Obtener canchas ya reservadas
+        $reservasExistentes = Reserva::where('codigo_disponibilidad', $idDisponibilidad)
             ->pluck('id_cancha');
     
-        // Verificar disponibilidad especial
-        $disponibilidadEspecial = DisponibilidadCanchas::where('fecha', $fecha)
-            ->where('hora', $hora)
-            ->first();
-    
-        // Buscar la primera cancha disponible
+        // Buscar la primera cancha disponible considerando los flags
         for ($cancha = 1; $cancha <= 3; $cancha++) {
-            // Verificar si ya está reservada
-            if ($reservasExistentes->contains($cancha)) {
+            // Verificar si la cancha está habilitada según el flag
+            if (!$disponibilidad["cancha_$cancha"]) {
                 continue;
             }
     
-            // Verificar disponibilidad especial
-            if ($disponibilidadEspecial && !$disponibilidadEspecial["cancha_$cancha"]) {
+            // Verificar si ya está reservada
+            if ($reservasExistentes->contains($cancha)) {
                 continue;
             }
     
@@ -176,6 +152,15 @@ class CanchasController extends Controller
         }
     
         return null;
+    }
+
+    public function generarComprobante(Request $request)
+    {
+        return view('comprobante', [
+            'fecha' => $request->query('fecha'),
+            'hora' => $request->query('hora'),
+            'cancha' => $request->query('cancha')
+        ]);
     }
 
 }

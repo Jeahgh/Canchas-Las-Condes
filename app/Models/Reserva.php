@@ -12,14 +12,15 @@ class Reserva extends Model
         'id_usuario',
         'id_cancha',
         'fecha_reserva',
-        'estado'
+        'estado',
+        'codigo_disponibilidad'
     ];
 
     protected $casts = [
         'id_usuario' => 'integer',
         'id_cancha' => 'integer',
         'fecha_reserva' => 'date',
-        'hora' => 'string',
-        'estado' => 'integer'
+        'estado' => 'integer',
+        'codigo_disponibilidad' => 'integer'
     ];
 }
