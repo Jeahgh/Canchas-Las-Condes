@@ -29,7 +29,8 @@ Route::middleware(['auth', 'check.status'])->group(function () {
 
     // rutas de concatcos
     Route::get('contacto', [ContactoController::class, 'index'])->name('contacto.index');
-   
+    Route::post('contacto', [ContactoController::class, 'store'])->name('contacto.store');
+       
    //funciomes de canchas
     Route::get('/canchas', [CanchasController::class, 'index'])->name('canchas.index');
     Route::post('crearReserva', [CanchasController::class, 'create'])->name('reservas.create');

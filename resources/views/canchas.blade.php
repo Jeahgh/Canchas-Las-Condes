@@ -44,8 +44,6 @@
                     @php 
                         $counter = 0; 
                         $today = now()->format('Y-m-d');
-                        $startOfWeek = now()->startOfWeek()->format('Y-m-d');
-                        $endOfWeek = now()->endOfWeek()->format('Y-m-d');
                     @endphp
                     @foreach($calendario as $dia)
                         @if($counter % 7 == 0)
@@ -57,7 +55,6 @@
                                 
                                 @php
                                     $isDiaHabilitado = $dia && 
-                                        $dia->format('Y-m-d') >= $today &&
                                         $dia->format('Y-m-d') >= $startOfWeek && 
                                         $dia->format('Y-m-d') <= $endOfWeek;
                                 @endphp
@@ -84,36 +81,103 @@
         </div>
     </div>
 
-    <!-- Modal Reserva-->
-    <div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="reservationModalLabel">Generar Reserva</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="info-footer mt-4 mb-5">
+        <div class="card border-0 bg-light shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-custom-blue mb-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Información Importante
+                </h5>
+                
+                <div class="row g-4">
+                    <!-- Horarios -->
+                    <div class="col-md-6">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-clock text-custom-blue fa-lg"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="fw-bold mb-1">Horario de Reservas</h6>
+                                <p class="mb-0">Las reservas para el día siguiente se habilitan a partir de las 21:00 hrs.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Período -->
+                    <div class="col-md-6">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-calendar-alt text-custom-blue fa-lg"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="fw-bold mb-1">Período de Reserva</h6>
+                                <p class="mb-0">Puede reservar con hasta una semana de anticipación.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Documentación -->
+                    <div class="col-md-6">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-id-card text-custom-blue fa-lg"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="fw-bold mb-1">Documentación Requerida</h6>
+                                <p class="mb-0">Debe presentar su carnet de identidad y tarjeta de vecino residente actualizada.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Condiciones -->
+                    <div class="col-md-6">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-exclamation-triangle text-custom-blue fa-lg"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="fw-bold mb-1">Condiciones</h6>
+                                <p class="mb-0">En caso de lluvia o cancha mojada, las reservas serán anuladas automáticamente.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <form id="reservaForm" onsubmit="crearReserva(event)" method="POST">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="fecha_reserva" class="form-label">Fecha</label>
-                            <input type="date" class="form-control" id="fecha_reserva" name="fecha_reserva" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label for="horario" class="form-label">Horario</label>
-                            <select class="form-select" id="horario" name="horario" required>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn text-white bg-custom-blue">Reservar</button>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
 </div>
+
+
+<!-- Modal Reserva-->
+<div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reservationModalLabel">Generar Reserva</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="reservaForm" onsubmit="crearReserva(event)" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="fecha_reserva" class="form-label">Fecha</label>
+                        <input type="date" class="form-control" id="fecha_reserva" name="fecha_reserva" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="horario" class="form-label">Horario</label>
+                        <select class="form-select" id="horario" name="horario" required>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn text-white bg-custom-blue">Reservar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 
 <!-- Modal Confirmación de Reserva -->
 <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
@@ -423,7 +487,46 @@
         transition: all 0.3s ease;
     }
 
+    /* Estilos del footer */
 
+    .info-footer .card {
+        border-radius: 1rem;
+        background: linear-gradient(to right bottom, #f8f9fa, #ffffff);
+    }
+
+    .info-footer .fas {
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .info-footer .card-title {
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+
+    .info-footer .card-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background-color: var(--custom-blue);
+        border-radius: 2px;
+    }
+
+    .info-footer h6 {
+        color: var(--custom-blue);
+    }
+
+    .info-footer p {
+        color: #6c757d;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
             
 </style>
 

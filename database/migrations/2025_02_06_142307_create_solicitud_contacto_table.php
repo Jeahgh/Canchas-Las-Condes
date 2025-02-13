@@ -15,10 +15,10 @@ class CreateSolicitudContactoTable extends Migration
     {
         Schema::create('solicitud_contacto', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('id_usuario'); // id del usuario que solicita el contacto
-            $table->string('mensaje'); // mensaje que envia el usuario
-            $table->integer('tipo_solicitud'); // tipo de solicitud
-            $table->integer('estado'); // estado de la solicitud
+            $table->integer('id_usuario');
+            $table->string('mensaje');
+            $table->integer('tipo_solicitud');
+            $table->integer('estado')->default(1); // Añadimos el valor por defecto
             $table->timestamps();
         });
     }
